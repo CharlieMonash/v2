@@ -369,11 +369,8 @@ class Operate:
         self.draw_pygame_window(canvas, grid,position=(h_pad, 240+2*v_pad))
        
        # detector - ChARLIE
-        detector_view = cv2.resize(self.network_vis,
-                                    (320, 240), cv2.INTER_NEAREST)
-        self.draw_pygame_window(canvas, detector_view,
-                                position=(3*h_pad + 2*320, v_pad)
-                                )
+        detector_view = cv2.resize(self.network_vis,(320, 240), cv2.INTER_NEAREST)
+        self.draw_pygame_window(canvas, detector_view, position=(3*h_pad + 2*320, v_pad))
 
         #Defining colours to use for the GUI
         black = pygame.Color(0,0,0)
@@ -696,7 +693,3 @@ if __name__ == "__main__":
         # visualise
         operate.draw(canvas)
         pygame.display.update()
-
-
-
-
