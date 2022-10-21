@@ -640,7 +640,7 @@ if __name__ == "__main__":
     parser.add_argument("--calib_dir", type=str, default="calibration/param/")
     parser.add_argument("--save_data", action='store_true')
     parser.add_argument("--play_data", action='store_true')
-    parser.add_argument("--true_map", default="maps/7fruits_practise_map_1.txt")
+    parser.add_argument("--true_map", default="maps/7fruits_practice_map_1.txt")
     parser.add_argument("--ckpt", default='best.pt')
     args, _ = parser.parse_known_args()
     #Changes I've made 
