@@ -158,7 +158,7 @@ class Operate:
             self.ekf.add_landmarks(lms)
             self.ekf.update(lms)
 
-    def get_bounding_box(fruit_select):
+    def get_bounding_box(self,fruit_select):
         #Multiplying the pixel values by the appropraite scale
         xmin = fruit_select[0] *480/240
         ymin = fruit_select[1] *640/320
@@ -412,7 +412,7 @@ class Operate:
                     self.completed_img_dict[self.dict_idx+1] = {'target': box, 'robot': pose}
                     #increment dictionary index
                     self.dict_idx +=1
-        print("I am just checking/n")
+        
         print(self.completed_img_dict)
     """
         # using computer vision to detect targets
