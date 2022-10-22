@@ -319,34 +319,32 @@ class Operate:
 
             return slam_pos
 
-        def read_fruit_map(self,fname):
-            """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
+    def read_fruit_map(self,fname):
+        """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 
-            @param fname: filename of the map
-            @return:
-                1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
-                2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
-                3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-            """
-            with open(fname, 'r') as fd:
-                gt_dict = json.load(fd)
-                fruit_list = []
-                fruit_true_pos = []
+        @param fname: filename of the map
+        @return:
+            1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
+            2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
+            3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
+        """
+        with open(fname, 'r') as fd:
+            gt_dict = json.load(fd)
+            fruit_list = []
+            fruit_true_pos = []
 
-                # remove unique id of targets of the same type
-                for key in gt_dict:
-                    x = np.round(gt_dict[key]['x'], 1)
-                    y = np.round(gt_dict[key]['y'], 1)
+            # remove unique id of targets of the same type
+            for key in gt_dict:
+                x = np.round(gt_dict[key]['x'], 1)
+                y = np.round(gt_dict[key]['y'], 1)
 
-                    fruit_list.append(key[:-2])
-                    if len(fruit_true_pos) == 0:
-                        fruit_true_pos = np.array([[x, y]])
-                    else:
-                        fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
+                fruit_list.append(key[:-2])
+                if len(fruit_true_pos) == 0:
+                    fruit_true_pos = np.array([[x, y]])
+                else:
+                    fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
 
-            return fruit_list, fruit_true_pos
-
-
+        return fruit_list, fruit_true_pos
 
 
             """
