@@ -329,20 +329,20 @@ class Operate:
                 3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
             """
             with open(fname, 'r') as fd:
-            gt_dict = json.load(fd)
-            fruit_list = []
-            fruit_true_pos = []
+                gt_dict = json.load(fd)
+                fruit_list = []
+                fruit_true_pos = []
 
-            # remove unique id of targets of the same type
-            for key in gt_dict:
-                x = np.round(gt_dict[key]['x'], 1)
-                y = np.round(gt_dict[key]['y'], 1)
+                # remove unique id of targets of the same type
+                for key in gt_dict:
+                    x = np.round(gt_dict[key]['x'], 1)
+                    y = np.round(gt_dict[key]['y'], 1)
 
-                fruit_list.append(key[:-2])
-                if len(fruit_true_pos) == 0:
-                    fruit_true_pos = np.array([[x, y]])
-                else:
-                    fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
+                    fruit_list.append(key[:-2])
+                    if len(fruit_true_pos) == 0:
+                        fruit_true_pos = np.array([[x, y]])
+                    else:
+                        fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
 
             return fruit_list, fruit_true_pos
 
