@@ -16,29 +16,23 @@ import pygame # python package for GUI
 import shutil # python package for file operations
 import copy
 from pathlib import Path
+
 # import SLAM components
 sys.path.insert(0, "{}/slam".format(os.getcwd()))
 from slam.ekf import EKF
 from slam.robot import Robot
 import slam.aruco_detector as aruco
 
-
 # import components for the detector
 import torch
 import json
 from sklearn.cluster import KMeans
-
 from network.scripts.detector import Detector
 
 class Operate:
     def __init__(self, args):
-        self.folder = 'pibot_dataset/'
-        if not os.path.exists(self.folder):
-            os.makedirs(self.folder)
-        else:
-            shutil.rmtree(self.folder)
-            os.makedirs(self.folder)
-        
+        self.folder = 'lab_output/'
+ 
         # initialise data parameters
         if args.play_data:
             self.pibot = dh.DatasetPlayer("record")
@@ -47,8 +41,7 @@ class Operate:
 
         # initialise SLAM parameters
         self.ekf = self.init_ekf(args.calib_dir, args.ip)
-        self.aruco_det = aruco.aruco_detector(
-            self.ekf.robot, marker_length = 0.07) # size of the ARUCO markers
+        self.aruco_det = aruco.aruco_detector(self.ekf.robot, marker_length = 0.07) # size of the ARUCO markers
 
         if args.save_data:
             self.data = dh.DatasetWriter('record')
@@ -59,6 +52,7 @@ class Operate:
                         'inference': False,
                         'output': False,
                         'save_inference': False,
+                        'read_inference': False
                         'save_image': False}
         self.quit = False
         self.pred_fname = ''
@@ -157,7 +151,7 @@ class Operate:
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
             self.ekf.update(lms)
-
+    """
     def get_bounding_box(self,fruit_select):
         #Multiplying the pixel values by the appropraite scale
         xmin = fruit_select[0] *480/240
@@ -417,7 +411,7 @@ class Operate:
                     #increment dictionary index
                     self.dict_idx +=1
         
-    """
+    """"""
         # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -426,6 +420,7 @@ class Operate:
             self.file_output = (self.detector_output, self.ekf)
             #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
             self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
+    """"""
     """
     
     # save images taken by the camera
@@ -454,19 +449,20 @@ class Operate:
         robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
         return EKF(robot)
 
-
+    """
+    def read_fruit_data(self):
+        if self.command['read_inference']:
+            target_map = self.estimate_pose()
+            target_est = self.merge_estimations(target_map)
+            base_dir = Path('./')           
+            # save target pose estimations
+            with open(base_dir/'lab_output/targets.txt', 'w') as fo:
+                json.dump(target_est, fo)
+            self.notification = 'Fruit Locations Saved'
+            self.command['read_inference'] = False
+    """
     # save SLAM map
     def record_data(self):
-        #Charlie - not up to this yet: If it works I am happy if it dosent comment it out again
-        # merge the estimations of the targets so that there are at most 3 estimations of each target type
-        target_map = self.estimate_pose()
-        target_est = self.merge_estimations(target_map)
-        base_dir = Path('./')           
-        # save target pose estimations
-        with open(base_dir/'lab_output/targets.txt', 'w') as fo:
-            json.dump(target_est, fo)
-        #self.notification = 'Estimations saved'
-
         if self.command['output']:
             self.output.write_map(self.ekf)
             self.notification = 'Map of ARUCO markers is saved'
@@ -482,133 +478,7 @@ class Operate:
             self.command['save_inference'] = False
             #Writing the bounding boxes and pose to a file
 
-        
-    # paint the GUI
-    """
-    def draw(self, canvas):
-        canvas.blit(self.bg, (0, 0))
-        text_colour = (220, 220, 220)
-        v_pad = 40
-        h_pad = 20
- 
-        # EKF show
-        ekf_view = self.ekf.draw_slam_state(res=(320, 480+v_pad),not_pause = self.ekf_on)
-        canvas.blit(ekf_view, (2*h_pad+320, v_pad))
-        robot_view = cv2.resize(self.aruco_img, (320, 240))
-        self.draw_pygame_window(canvas, robot_view,position=(h_pad, v_pad))
-
-        # display grid
-        #grid = cv2.resize(self.grid,(240, 240), cv2.INTER_NEAREST)
-        #self.draw_pygame_window(canvas, grid,position=(h_pad, 240+2*v_pad))
-
-        
-        # for target detector (M3)
-        detector_view = cv2.resize(self.network_vis,
-                                   (320, 240), cv2.INTER_NEAREST)
-        self.draw_pygame_window(canvas, detector_view, 
-                                position=(h_pad, 240+2*v_pad)
-                                )
-       
-        #Defining colours to use for the GUI
-        black = pygame.Color(0,0,0)
-        red = pygame.Color(255,0,0)
-        blue = pygame.Color(0,0,255)
-        green = pygame.Color(102,204,0)
-        yellow = pygame.Color(255,255,0)
-        orange = pygame.Color(255,165,0)
-        magenta = pygame.Color(255,0,255)
-        grey = pygame.Color(220,220,220)
-        purple = pygame.Color(128,0,128)
-
-        #Painting Marker positions on the grid
-        """"""
-        for marker in self.aruco_true_pos:
-            x = int(marker[0]*80 + 120)
-            y = int(120 - marker[1]*80)
-            pygame.draw.circle(canvas, purple, (h_pad + x,240 + 2*v_pad + y),self.boundary*80,0)
-            pygame.draw.rect(canvas, black, (h_pad + x - 5,240 + 2*v_pad + y - 5,10,10))
-        """"""
-        '''#Painting the fruits on the grid
-        for i, fruit in enumerate(self.fruit_list):
-            if fruit == 'apple':
-                colour = red
-            elif fruit == 'lemon':
-                colour = yellow
-            elif fruit == 'orange':
-                colour = orange
-            elif fruit == 'pear':
-                colour = green
-            elif fruit == 'strawberry':
-                colour = magenta
-
-            x = int(self.fruit_true_pos[i][0]*80 + 120)
-            y = int(120 - self.fruit_true_pos[i][1]*80)
-            #Drawing the fruit on the grid
-            pygame.draw.circle(canvas, colour, (h_pad + x,240 + 2*v_pad + y),4)
-            if fruit not in self.search_list:
-                pygame.draw.circle(canvas, blue, (h_pad + x,240 + 2*v_pad + y),self.boundary*80)
-            else:
-                pygame.draw.circle(canvas, black, (h_pad + x,240 + 2*v_pad + y),0.5*80, 2)'''
-            
-            
-        #Painting the robot on the grid
-        x = int(self.robot_pose[0]*80 + 120)
-        y = int(120 - self.robot_pose[1]*80)
-        x2 = int(x + 20*np.cos(self.robot_pose[2]))
-        y2 = int(y - 20*np.sin(self.robot_pose[2]))
-        pygame.draw.rect(canvas, blue, (h_pad + x - 5,240 + 2*v_pad + y - 5,10,10))
-        pygame.draw.line(canvas, black, (h_pad + x,240 + 2*v_pad + y),(h_pad + x2,240 + 2*v_pad + y2))
-
-        #Draw the waypoint
-        x = int(self.wp[0]*80 + 120)
-        y = int(120 - self.wp[1]*80)
-        pygame.draw.line(canvas, red,(h_pad + x-5,240 + 2*v_pad + y-5), (h_pad + x + 5,240 + 2*v_pad + y + 5))
-        pygame.draw.line(canvas, red,(h_pad + x + 5,240 + 2*v_pad + y-5), (h_pad + x - 5,240 + 2*v_pad + y + 5))
-
-        #Draw path
-        for path in self.paths:
-            for i in range(len(path)-1):
-                x = int(path[i][0]*80 + 120)
-                y = int(120 - path[i][1]*80)
-                x2 = int(path[i+1][0]*80 + 120)
-                y2 = int(120 - path[i+1][1]*80)
-                pygame.draw.line(canvas, blue, (2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2))
-
-
-        #self.put_caption(canvas, caption='Grid Map',position=(2*h_pad+320, v_pad))
-        self.put_caption(canvas, caption='SLAM', position=(h_pad, 2*v_pad))
-        self.put_caption(canvas, caption='PiBot Cam', position=(h_pad, v_pad))
-        self.put_caption(canvas, caption='Detector', position=(3*h_pad + 2*320,v_pad))
-
-        notifiation = TEXT_FONT.render(self.notification,
-                                          False, text_colour)
-        canvas.blit(notifiation, (h_pad+10, 596))
-
-        time_remain = self.count_down - time.time() + self.start_time
-        if time_remain > 0:
-            time_remain = f'Count Down: {time_remain:03.0f}s'
-        elif int(time_remain)%2 == 0:
-            time_remain = "Time Up !!"
-        else:
-            time_remain = ""
-        count_down_surface = TEXT_FONT.render(time_remain, False, (50, 50, 50))
-        canvas.blit(count_down_surface, (2*h_pad+320+5, 530))
-        return canvas
-
-    @staticmethod
-    def draw_pygame_window(canvas, cv2_img, position):
-        cv2_img = np.rot90(cv2_img)
-        view = pygame.surfarray.make_surface(cv2_img)
-        view = pygame.transform.flip(view, True, False)
-        canvas.blit(view, position)
-    
-    @staticmethod
-    def put_caption(canvas, caption, position, text_colour=(200, 200, 200)):
-        caption_surface = TITLE_FONT.render(caption,
-                                          False, text_colour)
-        canvas.blit(caption_surface, (position[0], position[1]-25))
-"""
- # paint the GUI            
+    # paint the GUI            
     def draw(self, canvas):
         canvas.blit(self.bg, (0, 0))
         text_colour = (220, 220, 220)
@@ -616,29 +486,21 @@ class Operate:
         h_pad = 20
 
         # paint SLAM outputs
-        ekf_view = self.ekf.draw_slam_state(res=(320, 480+v_pad),
-            not_pause = self.ekf_on)
+        ekf_view = self.ekf.draw_slam_state(res=(320, 480+v_pad),not_pause = self.ekf_on)
         canvas.blit(ekf_view, (2*h_pad+320, v_pad))
         robot_view = cv2.resize(self.aruco_img, (320, 240))
-        self.draw_pygame_window(canvas, robot_view, 
-                                position=(h_pad, v_pad)
-                                )
+        self.draw_pygame_window(canvas, robot_view, position=(h_pad, v_pad))
 
         # for target detector (M3)
-        detector_view = cv2.resize(self.network_vis,
-                                   (320, 240), cv2.INTER_NEAREST)
-        self.draw_pygame_window(canvas, detector_view, 
-                                position=(h_pad, 240+2*v_pad)
-                                )
+        detector_view = cv2.resize(self.network_vis,(320, 240), cv2.INTER_NEAREST)
+        self.draw_pygame_window(canvas, detector_view,position=(h_pad, 240+2*v_pad))
 
         # canvas.blit(self.gui_mask, (0, 0))
         self.put_caption(canvas, caption='SLAM', position=(2*h_pad+320, v_pad))
-        self.put_caption(canvas, caption='Detector',
-                         position=(h_pad, 240+2*v_pad))
+        self.put_caption(canvas, caption='Detector', position=(h_pad, 240+2*v_pad))
         self.put_caption(canvas, caption='PiBot Cam', position=(h_pad, v_pad))
 
-        notifiation = TEXT_FONT.render(self.notification,
-                                          False, text_colour)
+        notifiation = TEXT_FONT.render(self.notification,False, text_colour)
         canvas.blit(notifiation, (h_pad+10, 596))
 
         time_remain = self.count_down - time.time() + self.start_time
@@ -661,12 +523,10 @@ class Operate:
     
     @staticmethod
     def put_caption(canvas, caption, position, text_colour=(200, 200, 200)):
-        caption_surface = TITLE_FONT.render(caption,
-                                          False, text_colour)
+        caption_surface = TITLE_FONT.render(caption,False, text_colour)
         canvas.blit(caption_surface, (position[0], position[1]-25))
     # keyboard teleoperation        
     def update_keyboard(self):
-
         relative_speed = 1
         for event in pygame.event.get():
             ########### replace with your M1 codes ###########
@@ -703,12 +563,7 @@ class Operate:
                 self.command['save_inference'] = True
             # AFR
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                self.path_idx = 0
-                self.point_idx = 1
-                self.waypoints = self.paths[self.path_idx] #set first path
-                self.wp = self.waypoints[self.point_idx] #set waypoint to second point in path
-                self.auto_path = True
-                print(f"Moving to new waypoint {self.wp}")
+                self.command['read_inference'] = True
             # quit
             # reset SLAM map
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
@@ -853,8 +708,6 @@ if __name__ == "__main__":
     parser.add_argument("--slam_map", default="lab_output/slam_map.txt")
     parser.add_argument("--fruit_poses", default="lab_output/targets.txt")
     args, _ = parser.parse_known_args()
-    #Loading the model path
-
 
     pygame.font.init() 
     TITLE_FONT = pygame.font.Font('pics/8-BitMadness.ttf', 35)
@@ -895,7 +748,7 @@ if __name__ == "__main__":
         drive_meas = operate.control()
         operate.update_slam(drive_meas)
         operate.record_data()
-        operate.detect_target()
+        #operate.detect_target()
         operate.save_image()
         # visualise
         operate.draw(canvas)
