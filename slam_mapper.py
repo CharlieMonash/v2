@@ -413,7 +413,6 @@ class Operate:
                     #increment dictionary index
                     self.dict_idx +=1
         
-        print(self.completed_img_dict)
     """
         # using computer vision to detect targets
     def detect_target(self):
