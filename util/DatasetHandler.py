@@ -109,6 +109,7 @@ class OutputWriter:
         
         self.img_f = open(folder_name+"images.txt", 'w')   
         self.map_f = folder_name+"slam.txt"
+        self.map_slam = folder_name+"slam_map.txt"
 
         self.image_count = 0
         
@@ -130,8 +131,8 @@ class OutputWriter:
                         {"y":slam.markers[i][0],
                         "x":slam.markers[i][1]}}
         #map_dict += "}"
-        with open(self.map_f, 'w') as map_f:
-            json.dump(map_dict, map_f, indent=2)
+        with open(self.map_slam, 'w') as map_slam:
+            json.dump(map_dict, map_slam, indent=2)
             
     def write_image(self, image, slam):
         img_fname = "{}pred_{}.png".format(self.folder, self.image_count)
