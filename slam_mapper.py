@@ -27,7 +27,7 @@ import slam.aruco_detector as aruco
 import torch
 import json
 from sklearn.cluster import KMeans
-#from network.scripts.detector import Detector
+from network.scripts.detector import Detector
 
 class Operate:
     def __init__(self, args):
@@ -100,7 +100,7 @@ class Operate:
         self.boundary = 0.30
         #Defining the model
         weight_path =  'network/scripts/model/best.pt'
-        self.detector = torch.hub.load('ultralytics/yolov5', 'custom', path=weight_path, force_reload=True)    
+        #self.detector = torch.hub.load('ultralytics/yolov5', 'custom', path=weight_path, force_reload=True)    
         calibration_path = 'calibration/param/'
         fileK = "{}intrinsic.txt".format('./calibration/param/')
         self.camera_matrix = np.loadtxt(fileK, delimiter=',')
