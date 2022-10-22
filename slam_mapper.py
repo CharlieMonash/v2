@@ -375,7 +375,7 @@ class Operate:
                 pass
         ########################################### 
         return target_est
-
+    """
     # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -410,6 +410,15 @@ class Operate:
                     self.completed_img_dict[self.dict_idx+1] = {'target': box, 'robot': pose}
                     #increment dictionary index
                     self.dict_idx +=1
+"""
+        # using computer vision to detect targets
+    def detect_target(self):
+        if self.command['inference'] and self.detector is not None:
+            self.detector_output, self.network_vis,self.bound_boxes = self.detector.detect_single_image(self.img)
+            self.command['inference'] = False
+            self.file_output = (self.detector_output, self.ekf)
+            #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
+            self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
 
     # save images taken by the camera
     def save_image(self):
@@ -483,8 +492,16 @@ class Operate:
         self.draw_pygame_window(canvas, robot_view,position=(h_pad, v_pad))
 
         # display grid
-        grid = cv2.resize(self.grid,(240, 240), cv2.INTER_NEAREST)
-        self.draw_pygame_window(canvas, grid,position=(h_pad, 240+2*v_pad))
+        #grid = cv2.resize(self.grid,(240, 240), cv2.INTER_NEAREST)
+        #self.draw_pygame_window(canvas, grid,position=(h_pad, 240+2*v_pad))
+
+        
+        # for target detector (M3)
+        detector_view = cv2.resize(self.network_vis,
+                                   (320, 240), cv2.INTER_NEAREST)
+        self.draw_pygame_window(canvas, detector_view, 
+                                position=(h_pad, 240+2*v_pad)
+                                )
        
         #Defining colours to use for the GUI
         black = pygame.Color(0,0,0)
@@ -498,12 +515,13 @@ class Operate:
         purple = pygame.Color(128,0,128)
 
         #Painting Marker positions on the grid
+        """
         for marker in self.aruco_true_pos:
             x = int(marker[0]*80 + 120)
             y = int(120 - marker[1]*80)
             pygame.draw.circle(canvas, purple, (h_pad + x,240 + 2*v_pad + y),self.boundary*80,0)
             pygame.draw.rect(canvas, black, (h_pad + x - 5,240 + 2*v_pad + y - 5,10,10))
-
+        """
         '''#Painting the fruits on the grid
         for i, fruit in enumerate(self.fruit_list):
             if fruit == 'apple':
@@ -551,8 +569,7 @@ class Operate:
                 pygame.draw.line(canvas, blue, (2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2))
 
 
-        self.put_caption(canvas, caption='Grid Map',
-                         position=(2*h_pad+320, v_pad))
+        #self.put_caption(canvas, caption='Grid Map',position=(2*h_pad+320, v_pad))
         self.put_caption(canvas, caption='SLAM', position=(h_pad, 2*v_pad))
         self.put_caption(canvas, caption='PiBot Cam', position=(h_pad, v_pad))
         self.put_caption(canvas, caption='Detector', position=(3*h_pad + 2*320,v_pad))
