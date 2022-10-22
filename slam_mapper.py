@@ -116,6 +116,7 @@ class Operate:
         self.dict_idx = 0
         self.tagret_pose_dict ={}
         self.grid = cv2.imread('grid.png')
+        self.raw_boxes=[]
 
         #Setting a condition for slam to map
         self.SLAM_DONE =FALSE
@@ -421,7 +422,7 @@ class Operate:
         # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
-            self.detector_output, self.network_vis,self.bound_boxes = self.detector.detect_single_image(self.img)
+            self.detector_output, self.network_vis,self.bound_boxes,self.raw_boxes = self.detector.detect_single_image(self.img)
             self.command['inference'] = False
             self.file_output = (self.detector_output, self.ekf)
             #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
