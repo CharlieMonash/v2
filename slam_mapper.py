@@ -52,7 +52,7 @@ class Operate:
                         'inference': False,
                         'output': False,
                         'save_inference': False,
-                        'read_inference': False
+                        'read_inference': False,
                         'save_image': False}
         self.quit = False
         self.pred_fname = ''
