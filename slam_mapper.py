@@ -411,7 +411,7 @@ class Operate:
                     #increment dictionary index
                     self.dict_idx +=1
         
-    """"""
+    """
         # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -420,7 +420,7 @@ class Operate:
             self.file_output = (self.detector_output, self.ekf)
             #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
             self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
-    """"""
+    """
     """
     
     # save images taken by the camera
@@ -431,6 +431,7 @@ class Operate:
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             cv2.imwrite(f_, image)
             self.image_id += 1
+            self.pred_fname = self.output.write_image(image,self.file_output[1])
             self.command['save_image'] = False
             self.notification = f'{f_} is saved'
 
@@ -469,7 +470,6 @@ class Operate:
             self.command['output'] = False
         # save inference with the matching robot pose and detector labels
         if self.command['save_inference']:
-            self.file_output = self.img
             if self.file_output is not None:
                 image = cv2.cvtColor(self.file_output[0], cv2.COLOR_RGB2BGR)
                 self.pred_fname = self.output.write_image(image,self.file_output[1])
