@@ -120,12 +120,6 @@ class Operate:
 
         #Setting a condition for slam to map
         self.SLAM_DONE =FALSE
-
-        #Creating paths from the know search_liat
-        #self.search_list = self.read_search_list()
-        #print(f'Fruit search order: {self.search_list}')
-        #self.generate_paths()
-
     
     # wheel control
     def control(self):       
@@ -383,7 +377,7 @@ class Operate:
                 pass
         ########################################### 
         return target_est
-    """
+    
     # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -427,7 +421,7 @@ class Operate:
             self.file_output = (self.detector_output, self.ekf)
             #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
             self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
-
+"""
     # save images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
@@ -487,6 +481,7 @@ class Operate:
 
         
     # paint the GUI
+    """
     def draw(self, canvas):
         canvas.blit(self.bg, (0, 0))
         text_colour = (220, 220, 220)
@@ -523,13 +518,13 @@ class Operate:
         purple = pygame.Color(128,0,128)
 
         #Painting Marker positions on the grid
-        """
+        """"""
         for marker in self.aruco_true_pos:
             x = int(marker[0]*80 + 120)
             y = int(120 - marker[1]*80)
             pygame.draw.circle(canvas, purple, (h_pad + x,240 + 2*v_pad + y),self.boundary*80,0)
             pygame.draw.rect(canvas, black, (h_pad + x - 5,240 + 2*v_pad + y - 5,10,10))
-        """
+        """"""
         '''#Painting the fruits on the grid
         for i, fruit in enumerate(self.fruit_list):
             if fruit == 'apple':
@@ -609,7 +604,63 @@ class Operate:
         caption_surface = TITLE_FONT.render(caption,
                                           False, text_colour)
         canvas.blit(caption_surface, (position[0], position[1]-25))
+"""
+ # paint the GUI            
+    def draw(self, canvas):
+        canvas.blit(self.bg, (0, 0))
+        text_colour = (220, 220, 220)
+        v_pad = 40
+        h_pad = 20
 
+        # paint SLAM outputs
+        ekf_view = self.ekf.draw_slam_state(res=(320, 480+v_pad),
+            not_pause = self.ekf_on)
+        canvas.blit(ekf_view, (2*h_pad+320, v_pad))
+        robot_view = cv2.resize(self.aruco_img, (320, 240))
+        self.draw_pygame_window(canvas, robot_view, 
+                                position=(h_pad, v_pad)
+                                )
+
+        # for target detector (M3)
+        detector_view = cv2.resize(self.network_vis,
+                                   (320, 240), cv2.INTER_NEAREST)
+        self.draw_pygame_window(canvas, detector_view, 
+                                position=(h_pad, 240+2*v_pad)
+                                )
+
+        # canvas.blit(self.gui_mask, (0, 0))
+        self.put_caption(canvas, caption='SLAM', position=(2*h_pad+320, v_pad))
+        self.put_caption(canvas, caption='Detector',
+                         position=(h_pad, 240+2*v_pad))
+        self.put_caption(canvas, caption='PiBot Cam', position=(h_pad, v_pad))
+
+        notifiation = TEXT_FONT.render(self.notification,
+                                          False, text_colour)
+        canvas.blit(notifiation, (h_pad+10, 596))
+
+        time_remain = self.count_down - time.time() + self.start_time
+        if time_remain > 0:
+            time_remain = f'Count Down: {time_remain:03.0f}s'
+        elif int(time_remain)%2 == 0:
+            time_remain = "Time Is Up !!!"
+        else:
+            time_remain = ""
+        count_down_surface = TEXT_FONT.render(time_remain, False, (50, 50, 50))
+        canvas.blit(count_down_surface, (2*h_pad+320+5, 530))
+        return canvas
+
+    @staticmethod
+    def draw_pygame_window(canvas, cv2_img, position):
+        cv2_img = np.rot90(cv2_img)
+        view = pygame.surfarray.make_surface(cv2_img)
+        view = pygame.transform.flip(view, True, False)
+        canvas.blit(view, position)
+    
+    @staticmethod
+    def put_caption(canvas, caption, position, text_colour=(200, 200, 200)):
+        caption_surface = TITLE_FONT.render(caption,
+                                          False, text_colour)
+        canvas.blit(caption_surface, (position[0], position[1]-25))
     # keyboard teleoperation        
     def update_keyboard(self):
 
