@@ -202,25 +202,29 @@ class Operate:
             true_height = target_dimensions[target_num-1][2]
             
             ######### Replace with your codes #########
-        
+            target_pose = {'y': 0.0, 'x': 0.0}
+            
+            cam_res = 640 # camera resolution in pixels
+
+            A = focal_length * true_height / box[3][0] # actual depth of object
+    
             x_robot = robot_pose[0][0]
             y_robot = robot_pose[1][0]
             theta_robot = robot_pose[2][0]
 
-            A = focal_length * true_height / box[3][0] # actual depth of object
+            x_camera = cam_res/2 - box[0][0]
+            theta_camera = np.arctan(x_camera/focal_length)
+            theta_total = theta_robot + theta_camera
 
-            x_camera = box[0][0] / focal_length * A
-            theta_camera = np.arctan(x_camera/A)
-            dist_fruit = np.hypot(x_camera, theta_camera)
-            theta_dif = theta_robot - theta_camera
-
-            x_object = dist_fruit * np.cos(theta_dif)
-            y_object = dist_fruit * np.cos(theta_dif)
+            y_object = A * np.cos(theta_total)
+            x_object = A * np.cos(theta_total)
             
             x_object_world = x_robot + x_object
             y_object_world = y_robot + y_object
 
             target_pose = {'y':y_object_world,'x':x_object_world}
+            #print(target_pose)
+            #print("")
             target_pose_dict[target_list[target_num-1]] = target_pose
             ###########################################
         return target_pose_dict
@@ -461,19 +465,17 @@ class Operate:
         # save target pose estimations
         with open(base_dir/'lab_output/targets.txt', 'w') as fo:
             json.dump(target_est, fo)
-        self.notification = 'Estimations saved'
+        #self.notification = 'Estimations saved'
 
         if self.command['output']:
             self.output.write_map(self.ekf)
-            #self.output.write_slam_map(self.ekf)
-            self.notification = 'Map is saved'
+            self.notification = 'Map of ARUCO markers is saved'
             self.command['output'] = False
         # save inference with the matching robot pose and detector labels
         if self.command['save_inference']:
             if self.file_output is not None:
                 image = cv2.cvtColor(self.file_output[0], cv2.COLOR_RGB2BGR)
-                self.pred_fname = self.output.write_image(image,
-                                                        self.file_output[1])
+                self.pred_fname = self.output.write_image(image,self.file_output[1])
                 self.notification = f'Prediction is saved to {operate.pred_fname}'
             else:
                 self.notification = f'No prediction in buffer, save ignored'
