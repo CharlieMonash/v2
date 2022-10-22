@@ -27,7 +27,7 @@ import slam.aruco_detector as aruco
 import torch
 import json
 from sklearn.cluster import KMeans
-from network.scripts.detector import Detector
+#from network.scripts.detector import Detector
 
 class Operate:
     def __init__(self, args):
@@ -470,6 +470,7 @@ class Operate:
             self.command['output'] = False
         # save inference with the matching robot pose and detector labels
         if self.command['save_inference']:
+            self.file_output = (self.detector_output, self.ekf)
             if self.file_output is not None:
                 image = cv2.cvtColor(self.file_output[0], cv2.COLOR_RGB2BGR)
                 self.pred_fname = self.output.write_image(image,self.file_output[1])
