@@ -347,26 +347,26 @@ class Operate:
         return fruit_list, fruit_true_pos
 
 
-            """
-            fruit_list = []
-            fruit_true_pos = []
-            with open(fname, 'r') as fd:
-                gt_dict = json.load(fd)
-                slam_pos = np.zeros([7,2])
-                i=0
-                # remove unique id of targets of the same type
-                for key in gt_dict["taglist"]:
-                    
-                    slam_pos[key-1,0] = np.round(gt_dict["map"][0][i], 1)
-                    slam_pos[key-1,1] = np.round(gt_dict["map"][1][i], 1)
-                    i+=1
-                    #marker_id = int(gt_dict["taglist"][key])
-                
-                    #aruco_true_pos[marker_id-1][0] = x
-                    #aruco_true_pos[marker_id-1][1] = y
+    """
+    fruit_list = []
+    fruit_true_pos = []
+    with open(fname, 'r') as fd:
+        gt_dict = json.load(fd)
+        slam_pos = np.zeros([7,2])
+        i=0
+        # remove unique id of targets of the same type
+        for key in gt_dict["taglist"]:
+            
+            slam_pos[key-1,0] = np.round(gt_dict["map"][0][i], 1)
+            slam_pos[key-1,1] = np.round(gt_dict["map"][1][i], 1)
+            i+=1
+            #marker_id = int(gt_dict["taglist"][key])
+        
+            #aruco_true_pos[marker_id-1][0] = x
+            #aruco_true_pos[marker_id-1][1] = y
 
-                return fruit_list, fruit_true_pos
-            """
+        return fruit_list, fruit_true_pos
+    """
     # Paint the GUI
     def draw(self, canvas):
         canvas.blit(self.bg, (0, 0))
