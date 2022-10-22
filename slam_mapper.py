@@ -28,6 +28,8 @@ import torch
 import json
 from sklearn.cluster import KMeans
 
+from network.scripts.detector import Detector
+
 class Operate:
     def __init__(self, args):
         self.folder = 'pibot_dataset/'
@@ -74,7 +76,12 @@ class Operate:
         self.img = np.zeros([240,320,3], dtype=np.uint8)
         self.aruco_img = np.zeros([240,320,3], dtype=np.uint8)
         self.bg = pygame.image.load('pics/gui_mask.jpg')
-
+        if args.ckpt == "":
+            self.detector = None
+            self.network_vis = cv2.imread('pics/8bit/detector_splash.png')
+        else:
+            self.detector = Detector(args.ckpt, use_gpu=False)
+            self.network_vis = np.ones((240, 320,3))* 100
          #Initialisng paramaters and arrays to be used
         self.robot_pose = np.array([0,0,0])
         self.paths = [[[0,0],[0.5,0.5]],[[0.5,0.5],[1,1]],[[1,1],[1,0.5]]]
@@ -375,7 +382,7 @@ class Operate:
                 pass
         ########################################### 
         return target_est
-
+    """
     # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -410,6 +417,15 @@ class Operate:
                     self.completed_img_dict[self.dict_idx+1] = {'target': box, 'robot': pose}
                     #increment dictionary index
                     self.dict_idx +=1
+"""
+        # using computer vision to detect targets
+    def detect_target(self):
+        if self.command['inference'] and self.detector is not None:
+            self.detector_output, self.network_vis,self.bound_boxes = self.detector.detect_single_image(self.img)
+            self.command['inference'] = False
+            self.file_output = (self.detector_output, self.ekf)
+            #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
+            self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
 
     # save images taken by the camera
     def save_image(self):
@@ -440,6 +456,8 @@ class Operate:
 
     # save SLAM map
     def record_data(self):
+        #Charlie - not up to this yet:
+        """
         # merge the estimations of the targets so that there are at most 3 estimations of each target type
         target_map = self.estimate_pose()
         target_est = self.merge_estimations(target_map)
@@ -448,9 +466,10 @@ class Operate:
         with open(base_dir/'fruit_estimates/targets.txt', 'w') as fo:
             json.dump(target_est, fo)
         self.notification = 'Estimations saved'
+        """
         if self.command['output']:
             self.output.write_map(self.ekf)
-            self.output.write_slam_map(self.ekf)
+            #self.output.write_slam_map(self.ekf)
             self.notification = 'Map is saved'
             self.command['output'] = False
         # save inference with the matching robot pose and detector labels
@@ -480,8 +499,16 @@ class Operate:
         self.draw_pygame_window(canvas, robot_view,position=(h_pad, v_pad))
 
         # display grid
-        grid = cv2.resize(self.grid,(240, 240), cv2.INTER_NEAREST)
-        self.draw_pygame_window(canvas, grid,position=(h_pad, 240+2*v_pad))
+        #grid = cv2.resize(self.grid,(240, 240), cv2.INTER_NEAREST)
+        #self.draw_pygame_window(canvas, grid,position=(h_pad, 240+2*v_pad))
+
+        
+        # for target detector (M3)
+        detector_view = cv2.resize(self.network_vis,
+                                   (320, 240), cv2.INTER_NEAREST)
+        self.draw_pygame_window(canvas, detector_view, 
+                                position=(h_pad, 240+2*v_pad)
+                                )
        
         #Defining colours to use for the GUI
         black = pygame.Color(0,0,0)
@@ -495,12 +522,13 @@ class Operate:
         purple = pygame.Color(128,0,128)
 
         #Painting Marker positions on the grid
+        """
         for marker in self.aruco_true_pos:
             x = int(marker[0]*80 + 120)
             y = int(120 - marker[1]*80)
             pygame.draw.circle(canvas, purple, (h_pad + x,240 + 2*v_pad + y),self.boundary*80,0)
             pygame.draw.rect(canvas, black, (h_pad + x - 5,240 + 2*v_pad + y - 5,10,10))
-
+        """
         '''#Painting the fruits on the grid
         for i, fruit in enumerate(self.fruit_list):
             if fruit == 'apple':
@@ -548,8 +576,7 @@ class Operate:
                 pygame.draw.line(canvas, blue, (2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2))
 
 
-        self.put_caption(canvas, caption='Grid Map',
-                         position=(2*h_pad+320, v_pad))
+        #self.put_caption(canvas, caption='Grid Map',position=(2*h_pad+320, v_pad))
         self.put_caption(canvas, caption='SLAM', position=(h_pad, 2*v_pad))
         self.put_caption(canvas, caption='PiBot Cam', position=(h_pad, v_pad))
         self.put_caption(canvas, caption='Detector', position=(3*h_pad + 2*320,v_pad))

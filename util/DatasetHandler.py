@@ -119,8 +119,8 @@ class OutputWriter:
     
     def write_map(self, slam):
         map_dict = {"taglist":slam.taglist,
-                    "map":slam.markers.tolist(),
-                    "covariance":slam.P[3:,3:].tolist()}
+                    "map":slam.markers.tolist()}#,
+                    #"covariance":slam.P[3:,3:].tolist()}
         with open(self.map_f, 'w') as map_f:
             json.dump(map_dict, map_f, indent=2)
 
