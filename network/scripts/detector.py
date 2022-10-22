@@ -35,7 +35,7 @@ class Detector:
         #Making a result array to return the predictions
         pred_results = np.zeros((num_preds,5))
         #Going throuch prediction and gettring the bounding box and class prediction
-        file_result = open('fruit_estimates/fruit_boxes.txt', 'a')
+        #file_result = open('fruit_estimates/fruit_boxes.txt', 'a')
         for i in range(num_preds):
             #Get the class
             predic_class = int(pred.pandas().xyxy[0]["class"][i])
