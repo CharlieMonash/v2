@@ -453,17 +453,16 @@ class Operate:
 
     # save SLAM map
     def record_data(self):
-        #Charlie - not up to this yet:
-        """
+        #Charlie - not up to this yet: If it works I am happy if it dosent comment it out again
         # merge the estimations of the targets so that there are at most 3 estimations of each target type
         target_map = self.estimate_pose()
         target_est = self.merge_estimations(target_map)
         base_dir = Path('./')           
         # save target pose estimations
-        with open(base_dir/'fruit_estimates/targets.txt', 'w') as fo:
+        with open(base_dir/'lab_output/targets.txt', 'w') as fo:
             json.dump(target_est, fo)
         self.notification = 'Estimations saved'
-        """
+
         if self.command['output']:
             self.output.write_map(self.ekf)
             #self.output.write_slam_map(self.ekf)
