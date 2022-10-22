@@ -412,6 +412,8 @@ class Operate:
                     self.completed_img_dict[self.dict_idx+1] = {'target': box, 'robot': pose}
                     #increment dictionary index
                     self.dict_idx +=1
+        print("I am just checking/n")
+        print(self.completed_img_dict)
     """
         # using computer vision to detect targets
     def detect_target(self):
@@ -422,6 +424,7 @@ class Operate:
             #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
             self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
     """
+    
     # save images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
@@ -847,8 +850,8 @@ if __name__ == "__main__":
     parser.add_argument("--save_data", action='store_true')
     parser.add_argument("--play_data", action='store_true')
     parser.add_argument("--ckpt", default='network/scripts/model/best.pt')
-    parser.add_argument("--slam_map", default="fruit_estimates/slam_map.txt")
-    parser.add_argument("--fruit_poses", default="fruit_estimates/targets.txt")
+    parser.add_argument("--slam_map", default="lab_output/slam_map.txt")
+    parser.add_argument("--fruit_poses", default="lab_output/targets.txt")
     args, _ = parser.parse_known_args()
     #Loading the model path
 
