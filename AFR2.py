@@ -367,6 +367,7 @@ class Operate:
             slam_pos = np.zeros([10,2])
             i=0
             # remove unique id of targets of the same type
+            print(gt_dict)
             for key in gt_dict["taglist"]:
                 
                 slam_pos[key-1,0] = np.round(gt_dict["map"][0][i], 1)
@@ -405,7 +406,7 @@ class Operate:
                     fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
 
         return fruit_list, fruit_true_pos
-        
+
     # paint the GUI
     def draw(self, canvas):
         canvas.blit(self.bg, (0, 0))
