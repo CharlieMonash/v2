@@ -431,7 +431,7 @@ class Operate:
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             cv2.imwrite(f_, image)
             self.image_id += 1
-            self.pred_fname = self.output.write_image(image,self.file_output[1])
+            self.pred_fname = self.output.write_image(image,self.ekf)
             self.command['save_image'] = False
             self.notification = f'{f_} is saved'
 
