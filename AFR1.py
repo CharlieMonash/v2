@@ -101,7 +101,8 @@ class Operate:
 
         #Add known markers and fruits from map to SLAM
         #self.fruit_list, self.fruit_true_pos, self.aruco_true_pos = self.read_true_map(args.true_map)
-        self.fruit_list, self.fruit_true_pos, self.aruco_true_pos = self.read_slam_map(args.true_map)
+        self.aruco_true_pos = self.read_slam_map(args.true_map)
+        self.fruit_list, self.fruit_true_pos = self.read_fruit_map(args.true_map)
         self.marker_gt = np.zeros((2,len(self.aruco_true_pos) + len(self.fruit_true_pos)))
         self.marker_gt, self.taglist, self.P = self.parse_slam_map(self.fruit_list, self.fruit_true_pos, self.aruco_true_pos)
         self.ekf.load_map(self.marker_gt, self.taglist, self.P)
@@ -317,8 +318,58 @@ class Operate:
                 #aruco_true_pos[marker_id-1][0] = x
                 #aruco_true_pos[marker_id-1][1] = y
 
-            return _,_,slam_pos
+            return slam_pos
 
+        def read_fruit_map(self,fname):
+            """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
+
+            @param fname: filename of the map
+            @return:
+                1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
+                2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
+                3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
+            """
+            with open(fname, 'r') as fd:
+            gt_dict = json.load(fd)
+            fruit_list = []
+            fruit_true_pos = []
+
+            # remove unique id of targets of the same type
+            for key in gt_dict:
+                x = np.round(gt_dict[key]['x'], 1)
+                y = np.round(gt_dict[key]['y'], 1)
+
+                fruit_list.append(key[:-2])
+                if len(fruit_true_pos) == 0:
+                    fruit_true_pos = np.array([[x, y]])
+                else:
+                    fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
+
+            return fruit_list, fruit_true_pos
+
+
+
+
+            """
+            fruit_list = []
+            fruit_true_pos = []
+            with open(fname, 'r') as fd:
+                gt_dict = json.load(fd)
+                slam_pos = np.zeros([7,2])
+                i=0
+                # remove unique id of targets of the same type
+                for key in gt_dict["taglist"]:
+                    
+                    slam_pos[key-1,0] = np.round(gt_dict["map"][0][i], 1)
+                    slam_pos[key-1,1] = np.round(gt_dict["map"][1][i], 1)
+                    i+=1
+                    #marker_id = int(gt_dict["taglist"][key])
+                
+                    #aruco_true_pos[marker_id-1][0] = x
+                    #aruco_true_pos[marker_id-1][1] = y
+
+                return fruit_list, fruit_true_pos
+            """
     # Paint the GUI
     def draw(self, canvas):
         canvas.blit(self.bg, (0, 0))
