@@ -450,6 +450,7 @@ class Operate:
         self.notification = 'Estimations saved'
         if self.command['output']:
             self.output.write_map(self.ekf)
+            self.output.write_slam_map(self.ekf)
             self.notification = 'Map is saved'
             self.command['output'] = False
         # save inference with the matching robot pose and detector labels
