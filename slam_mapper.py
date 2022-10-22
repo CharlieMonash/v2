@@ -74,7 +74,12 @@ class Operate:
         self.img = np.zeros([240,320,3], dtype=np.uint8)
         self.aruco_img = np.zeros([240,320,3], dtype=np.uint8)
         self.bg = pygame.image.load('pics/gui_mask.jpg')
-
+        if args.ckpt == "":
+            self.detector = None
+            self.network_vis = cv2.imread('pics/8bit/detector_splash.png')
+        else:
+            self.detector = Detector(args.ckpt, use_gpu=False)
+            self.network_vis = np.ones((240, 320,3))* 100
          #Initialisng paramaters and arrays to be used
         self.robot_pose = np.array([0,0,0])
         self.paths = [[[0,0],[0.5,0.5]],[[0.5,0.5],[1,1]],[[1,1],[1,0.5]]]
