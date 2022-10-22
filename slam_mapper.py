@@ -54,7 +54,7 @@ class Operate:
             self.data = dh.DatasetWriter('record')
         else:
             self.data = None
-        self.output = dh.OutputWriter('fruit_estimates')
+        self.output = dh.OutputWriter('lab_output')
         self.command = {'motion':[0, 0], 
                         'inference': False,
                         'output': False,
