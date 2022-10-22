@@ -28,6 +28,8 @@ import torch
 import json
 from sklearn.cluster import KMeans
 
+from network.scripts.detector import Detector
+
 class Operate:
     def __init__(self, args):
         self.folder = 'pibot_dataset/'
