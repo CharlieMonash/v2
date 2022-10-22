@@ -168,6 +168,7 @@ class Operate:
         class_converter = {0:1,1:3,2:4,3:5,4:2}
 
         return (class_converter[fruit], [fruit_xcent,fruit_ycent, fruit_width, fruit_height])
+        
     # estimate the pose of a target based on size and location of its bounding box in the robot's camera view and the robot's pose
     def estimate_pose(self):
         focal_length = self.camera_matrix[0][0]
