@@ -32,7 +32,7 @@ def get_bounding_box(target_number, image_path):
     # plt.show()
     # assert len(blobs) == 1, "An image should contain only one object of each target type"
     #Pssing the image through the network
-    _,_,yolo_results= Yolo.detect_single_image(image)
+    _,_,yolo_results,_= Yolo.detect_single_image(image)
     #Creating the box from the yellow results
     #print(yolo_results)
     shapes = yolo_results.shape
