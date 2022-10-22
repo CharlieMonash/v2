@@ -412,7 +412,7 @@ class Operate:
                     self.completed_img_dict[self.dict_idx+1] = {'target': box, 'robot': pose}
                     #increment dictionary index
                     self.dict_idx +=1
-"""
+    """
         # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -421,7 +421,7 @@ class Operate:
             self.file_output = (self.detector_output, self.ekf)
             #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
             self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
-"""
+    """
     # save images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
