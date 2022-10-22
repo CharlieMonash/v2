@@ -106,8 +106,8 @@ class Operate:
         self.boundary = 0.22
 
         #Add known markers and fruits from map to SLAM
-        self.fruit_list, self.fruit_true_pos, self.aruco_true_pos = self.read_true_map(args.true_map)
-        self.fruit_list, self.fruit_true_pos, self.aruco_true_pos = self.read_slam_map(args.true_map)
+        self.aruco_true_pos = self.read_slam_map(args.true_map_marker)
+        self.fruit_list, self.fruit_true_pos = self.read_fruit_map(args.true_map_fruit)
         self.marker_pos = np.zeros((2,len(self.aruco_true_pos) + len(self.fruit_true_pos)))
         self.marker_pos, self.taglist, self.P = self.parse_slam_map(self.fruit_list, self.fruit_true_pos, self.aruco_true_pos)
         self.ekf.load_map(self.marker_pos, self.taglist, self.P)
@@ -693,7 +693,8 @@ if __name__ == "__main__":
     parser.add_argument("--calib_dir", type=str, default="calibration/param/")
     parser.add_argument("--save_data", action='store_true')
     parser.add_argument("--play_data", action='store_true')
-    parser.add_argument("--true_map", default="maps/7fruits_practice_map_1.txt")
+    parser.add_argument("--true_map_marker", default="lab_output/slam.txt")
+    parser.add_argument("--true_map_fruit", default="lab_output/targets.txt")
     parser.add_argument("--ckpt", default='best.pt')
     args, _ = parser.parse_known_args()
     #Changes I've made 
