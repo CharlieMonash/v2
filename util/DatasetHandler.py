@@ -40,7 +40,7 @@ class DatasetWriter:
         self.kb_f.flush()
     
     def write_image(self, image):
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        #image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         ts = time.time() - self.t0
         img_fname = self.folder+str(self.image_count)+".png"
         row = [ts, self.image_count, img_fname]
@@ -141,6 +141,8 @@ class OutputWriter:
         self.image_count += 1
         img_dict = {"pose":slam.robot.state.tolist(),
                     "imgfname":img_fname}
+        img_dict = {"pose":self.robot_pose.tolist(),
+        "imgfname":img_fname}
         img_line = json.dumps(img_dict)
         self.img_f.write(img_line+'\n')
         self.img_f.flush()
