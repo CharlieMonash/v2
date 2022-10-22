@@ -440,6 +440,8 @@ class Operate:
 
     # save SLAM map
     def record_data(self):
+        #Charlie - not up to this yet:
+        """
         # merge the estimations of the targets so that there are at most 3 estimations of each target type
         target_map = self.estimate_pose()
         target_est = self.merge_estimations(target_map)
@@ -448,9 +450,10 @@ class Operate:
         with open(base_dir/'fruit_estimates/targets.txt', 'w') as fo:
             json.dump(target_est, fo)
         self.notification = 'Estimations saved'
+        """
         if self.command['output']:
             self.output.write_map(self.ekf)
-            self.output.write_slam_map(self.ekf)
+            #self.output.write_slam_map(self.ekf)
             self.notification = 'Map is saved'
             self.command['output'] = False
         # save inference with the matching robot pose and detector labels
