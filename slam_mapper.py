@@ -895,6 +895,7 @@ if __name__ == "__main__":
         drive_meas = operate.control()
         operate.update_slam(drive_meas)
         operate.record_data()
+        operate.detect_target()
         operate.save_image()
         # visualise
         operate.draw(canvas)
