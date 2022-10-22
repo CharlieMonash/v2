@@ -469,6 +469,7 @@ class Operate:
             self.command['output'] = False
         # save inference with the matching robot pose and detector labels
         if self.command['save_inference']:
+            self.file_output = self.img
             if self.file_output is not None:
                 image = cv2.cvtColor(self.file_output[0], cv2.COLOR_RGB2BGR)
                 self.pred_fname = self.output.write_image(image,self.file_output[1])
