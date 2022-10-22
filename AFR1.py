@@ -308,8 +308,8 @@ class Operate:
 
             # remove unique id of targets of the same type
             for key in gt_dict["taglist"]:
-                slam_pos[key,0] = np.round(gt_dict["map"][0][key], 1)
-                slam_pos[key,1] = np.round(gt_dict["map"][1][key], 1)
+                slam_pos[key-1,0] = np.round(gt_dict["map"][0][key-1], 1)
+                slam_pos[key-1,1] = np.round(gt_dict["map"][1][key-1], 1)
                 #marker_id = int(gt_dict["taglist"][key])
                
                 #aruco_true_pos[marker_id-1][0] = x
