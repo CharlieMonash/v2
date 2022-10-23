@@ -94,6 +94,7 @@ class Operate:
         self.fruit_list = []
         self.fruit_true_pos = []
         self.aruco_true_pos = np.empty([10, 2])
+        self.pred_count = 0
         #Contorl and travel parameters
         self.tick = 20
         self.turning_tick = 5
