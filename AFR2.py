@@ -108,6 +108,7 @@ class Operate:
         #Add known markers and fruits from map to SLAM
         self.aruco_true_pos = self.read_slam_map(args.true_map_marker)
         self.fruit_list, self.fruit_true_pos = self.read_fruit_map(args.true_map_fruit)
+        print(self.fruit_list)
         self.marker_pos = np.zeros((2,len(self.aruco_true_pos) + len(self.fruit_true_pos)))
         self.marker_pos, self.taglist, self.P = self.parse_slam_map(self.fruit_list, self.fruit_true_pos, self.aruco_true_pos)
         self.ekf.load_map(self.marker_pos, self.taglist, self.P)

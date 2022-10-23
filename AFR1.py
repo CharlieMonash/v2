@@ -394,6 +394,10 @@ class Operate:
         grey = pygame.Color(220,220,220)
         purple = pygame.Color(128,0,128)
 
+        print("Draw")
+        print(self.fruit_true_pos)
+        print(self.fruit_list)
+
         #Painting Marker positions on the grid
         for marker in self.aruco_true_pos:
             x = int(marker[0]*80 + 120)
@@ -416,6 +420,7 @@ class Operate:
 
             x = int(self.fruit_true_pos[i][0]*80 + 120)
             y = int(120 - self.fruit_true_pos[i][1]*80)
+
             if fruit not in self.search_list:
                 pygame.draw.circle(canvas, blue, (h_pad + x,240 + 2*v_pad + y),self.boundary*80)
             else:
