@@ -289,7 +289,7 @@ def read_search_list():
     return search_list
 
 # merge the estimations of the targets so that there are at most 3 estimations of each target type
-def merge_estimations(self,target_pose_dict):
+def merge_estimations(target_pose_dict):
     target_map = target_pose_dict
     apple_est, lemon_est, pear_est, orange_est, strawberry_est = [], [], [], [], []
     target_est = {}
@@ -324,25 +324,25 @@ def merge_estimations(self,target_pose_dict):
         lemon_est = np.array([np.mean(lemon_est, axis=0)])
     else:
         if len(lemon_est) > 2:
-            lemon_est = self.sort_locations_and_merge(lemon_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            lemon_est = sort_locations_and_merge(lemon_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     if 'pear' in search_list:
         pear_est = np.array([np.mean(pear_est, axis=0)])
     else:
         if len(pear_est) > 2:
-            pear_est = self.sort_locations_and_merge(pear_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            pear_est = sort_locations_and_merge(pear_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     if 'orange' in search_list:
         orange_est = np.array([np.mean(orange_est, axis=0)])
     else:
         if len(orange_est) > 2:
-            orange_est = self.sort_locations_and_merge(orange_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            orange_est = sort_locations_and_merge(orange_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     if 'strawberry' in search_list:
         strawberry_est = np.array([np.mean(strawberry_est, axis=0)])
     else:
         if len(strawberry_est) > 2:
-            strawberry_est = self.sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            strawberry_est = sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     for i in range(2):
         try:
@@ -391,7 +391,7 @@ if __name__ == "__main__":
         target_map[file_path] = estimate_pose(base_dir, camera_matrix, completed_img_dict)
 
     # merge the estimations of the targets so that there are at most 3 estimations of each target type
-    target_est = merge_estimations(self, target_map)
+    target_est = merge_estimations(target_map)
                      
     # save target pose estimations
     with open(base_dir/'lab_output/targets.txt', 'w') as fo:
