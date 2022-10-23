@@ -154,11 +154,8 @@ class Operate:
 
     # SLAM with ARUCO markers
     def update_slam(self, drive_meas):
-        # self.detector_output, self.aruco_img, self.bounding_boxes, pred_count = self.detector.detect_single_image(self.img)
         lms, self.aruco_img = self.aruco_det.detect_marker_positions(self.img)
-        # fruit_dict = estimate_fruit_pose(self.bounding_boxes, self.robot_pose)
-        # lms_fruit = self.detect_fruit_pos(fruit_dict)
-        # lms = lms + lms_fruit
+
         if self.request_recover_robot:
             is_success = self.ekf.recover_from_pause(lms)
             if is_success:
@@ -181,18 +178,7 @@ class Operate:
             self.file_output = (self.detector_output, self.ekf)
             # self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
             self.notification = f'{pred_count} fruits detected'
-    """
-    # save raw images taken by the camera
-    def save_image(self):
-        f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
-        if self.command['save_image']:
-            image = self.pibot.get_image()
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-            cv2.imwrite(f_, image)
-            self.image_id += 1
-            self.command['save_image'] = False
-            self.notification = f'{f_} is saved'
-    """
+
     # wheel and camera calibration for SLAM
     def init_ekf(self, datadir, ip):
         fileK = "{}intrinsic.txt".format(datadir)
@@ -207,33 +193,7 @@ class Operate:
         baseline = np.loadtxt(fileB, delimiter=',')
         robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
         return EKF(robot)
-    """
-    # function to save bounding box info
-    def bounding_box_output(self, box_list):
-        import json
-        with open(f'lab_output/pred_{self.pred_count}.txt', "w") as f:
-            json.dump(box_list, f)
-            self.pred_count += 1
-    """
-    """
-    # save SLAM map
-    def record_data(self):
-        if self.command['output']:
-            self.output.write_slam_map(self.ekf)
-            self.notification = 'Map is saved'
-            self.command['output'] = False
-        # save inference with the matching robot pose and detector labels
-        if self.command['save_inference']:
-            if self.file_output is not None:
-                image = cv2.cvtColor(self.file_output[0], cv2.COLOR_BGR2RGB)
-                self.pred_fname = self.output.write_image(image,
-                                                        self.file_output[1])
-                self.bounding_box_output(self.bounding_boxes) #save bounding box text file
-                self.notification = f'Prediction is saved to pred_{self.pred_count-1}.png'
-            else:
-                self.notification = f'No prediction in buffer, save ignored'
-            self.command['save_inference'] = False
-    """
+
     def parse_slam_map(self, fruit_list, fruits_true_pos, aruco_true_pos):
 
         #adding known aruco markers
@@ -348,7 +308,6 @@ class Operate:
                     fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
 
         return fruit_list, fruit_true_pos
-
 
     """
     fruit_list = []
