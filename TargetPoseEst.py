@@ -267,9 +267,9 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
                     position_est2.append(coordinates)
 
     # Merge position estimations
+    print(position_est2)
     position1 = merge_to_mean(position_est1, remove_outlier)
     position2 = merge_to_mean(position_est2, remove_outlier)
-    print(position2)
     # return the position estimations
     positions = []
     if(position1 is not None):
@@ -295,7 +295,8 @@ def read_search_list():
 # merge the estimations of the targets so that there are at most 3 estimations of each target type
 def merge_estimations(target_pose_dict):
     target_map = target_pose_dict
-    #print(target_map)
+
+    print(target_map)
     apple_est, lemon_est, pear_est, orange_est, strawberry_est = [], [], [], [], []
     target_est = {}
     
