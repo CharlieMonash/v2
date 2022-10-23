@@ -279,14 +279,14 @@ def read_search_list():
 
     @return: search order of the target fruits
     """
-    search_list = []
-    with open(search_list.txt, 'r') as fd:
+    search_list_1 = []
+    with open('search_list.txt', 'r') as fd:
         fruits = fd.readlines()
 
         for fruit in fruits:
-            search_list.append(fruit.strip())
+            search_list_1.append(fruit.strip())
 
-    return search_list
+    return search_list_1
 
 # merge the estimations of the targets so that there are at most 3 estimations of each target type
 def merge_estimations(target_pose_dict):
