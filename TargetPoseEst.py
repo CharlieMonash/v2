@@ -169,12 +169,12 @@ def mean_fruit(fruit_est):
                         min1 = i
                         min2 = j
         #merge two points by averaging
-        print("")
-        print(fruit_est[min1][1])
-        print(fruit_est[min2][1])
-        print("")
-        print(fruit_est[min1][0])
-        print(fruit_est[min2][0])
+        #print("")
+        #print(fruit_est[min1][1])
+        #print(fruit_est[min2][1])
+        #print("")
+        #print(fruit_est[min1][0])
+        #print(fruit_est[min2][0])
 
         x_avg = (fruit_est[min1][1] + fruit_est[min2][1])/2 #averaging x
         y_avg = (fruit_est[min1][0] + fruit_est[min2][0])/2 #averaging y
@@ -202,7 +202,7 @@ def merge_to_mean(position_est, remove_outlier = False):
 
     # Compute mean and standard deviations
     means = np.mean(position_est, axis = 0)
-    print(means)
+    #print(means)
     stds = np.std(position_est, axis = 0)
     mean_x = means[0]
     std_x = stds[0]
@@ -295,7 +295,7 @@ def read_search_list():
 # merge the estimations of the targets so that there are at most 3 estimations of each target type
 def merge_estimations(target_pose_dict):
     target_map = target_pose_dict
-    print(target_map)
+    #print(target_map)
     apple_est, lemon_est, pear_est, orange_est, strawberry_est = [], [], [], [], []
     target_est = {}
     
@@ -331,7 +331,7 @@ def merge_estimations(target_pose_dict):
         if len(lemon_est) > 2:
             lemon_est = sort_locations_and_merge(lemon_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
-    print(pear_est)
+    #print(pear_est)
     if 'pear' in search_list:
         pear_est = np.array([np.mean(pear_est, axis=0)])
     else:
@@ -426,17 +426,17 @@ if __name__ == "__main__":
         for line in fp.readlines():
             pose_dict = ast.literal_eval(line)
             image_poses[pose_dict['imgfname']] = pose_dict['pose']
-    print("Image Poses")
-    print(image_poses)
+    #print("Image Poses")
+    #print(image_poses)
     # estimate pose of targets in each detector output
     target_map = {}        
     for file_path in image_poses.keys():
         completed_img_dict = get_image_info(base_dir, file_path, image_poses)
         target_map[file_path] = estimate_pose(base_dir, camera_matrix, completed_img_dict)
-    print(target_map)
+    #print(target_map)
     # merge the estimations of the targets so that there are at most 3 estimations of each target type
     target_est = merge_estimations(target_map)
-    print(target_est)
+    #print(target_est)
     # save target pose estimations
     with open(base_dir/'lab_output/targets.txt', 'w') as fo:
         json.dump(target_est, fo)
