@@ -489,7 +489,7 @@ class Operate:
                 y = int(120 - path[i][1]*80)
                 x2 = int(path[i+1][0]*80 + 120)
                 y2 = int(120 - path[i+1][1]*80)
-                pygame.draw.line(canvas, blue, (2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2))
+                pygame.draw.line(canvas, blue, (h_pad + x-5,240 + 2*v_pad + y-5), (h_pad + x + 5,240 + 2*v_pad + y + 5)) #(2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2)) 
 
 
         self.put_caption(canvas, caption='Grid Map',
