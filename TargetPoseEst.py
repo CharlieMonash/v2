@@ -263,8 +263,8 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
                     position_est2.append(coordinates)
 
     # Merge position estimations
-    position1 = self.merge_to_mean(position_est1, remove_outlier)
-    position2 = self.merge_to_mean(position_est2, remove_outlier)
+    position1 = merge_to_mean(position_est1, remove_outlier)
+    position2 = merge_to_mean(position_est2, remove_outlier)
 
     # return the position estimations
     positions = []
