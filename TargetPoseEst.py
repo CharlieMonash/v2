@@ -391,7 +391,7 @@ if __name__ == "__main__":
         target_map[file_path] = estimate_pose(base_dir, camera_matrix, completed_img_dict)
 
     # merge the estimations of the targets so that there are at most 3 estimations of each target type
-    target_est = merge_estimations(target_map)
+    target_est = merge_estimations(self, target_map)
                      
     # save target pose estimations
     with open(base_dir/'lab_output/targets.txt', 'w') as fo:
