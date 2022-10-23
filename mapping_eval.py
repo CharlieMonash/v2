@@ -208,9 +208,9 @@ if __name__ == '__main__':
     import argparse
     
     parser = argparse.ArgumentParser('Matching the estimated map and the true map')
-    parser.add_argument('--true-map', type=str, default='true_map.txt')
-    parser.add_argument('--slam-est', type=str, default='slam.txt')
-    parser.add_argument('--target-est', type=str, default='targets.txt')
+    parser.add_argument('--true-map', type=str, default='maps/7fruits_practice_map_1.txt')
+    parser.add_argument('--slam-est', type=str, default='lab_output/slam_map.txt')
+    parser.add_argument('--target-est', type=str, default='lab_output/targets.txt')
     parser.add_argument('--slam-only', action='store_true')
     parser.add_argument('--target-only', action='store_true')
     args, _ = parser.parse_known_args()
