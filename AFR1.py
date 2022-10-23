@@ -123,13 +123,14 @@ class Operate:
         drive_meas = measure.Drive(lv, rv, dt)
         self.clock = time.time()
         return drive_meas
-    """
+    
     # camera control
     def take_pic(self):
         self.img = self.pibot.get_image()
+        """
         if not self.data is None:
             self.data.write_image(self.img)
-    """
+        """
     def detect_fruit_pos(self, dictionary):
         measurements = []
         for fruit in dictionary.keys():
