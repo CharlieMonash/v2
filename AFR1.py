@@ -655,7 +655,7 @@ if __name__ == "__main__":
 
         operate.update_slam(drive_meas)
         operate.robot_pose = operate.ekf.robot.state
-        operate.record_data()
+        #operate.record_data()
         operate.save_image()
         operate.detect_target()
         # Show graphics
