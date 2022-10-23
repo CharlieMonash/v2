@@ -239,9 +239,6 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
     position_est2 = []
     position_est = np.array(position_est)
 
-    print("Position Est")
-    print(position_est)
-
     # Sort data
     for i in range(len(position_est)):
 
@@ -351,6 +348,7 @@ def merge_estimations(target_pose_dict):
         strawberry_est = np.array([np.mean(strawberry_est, axis=0)])
     else:
         if len(strawberry_est) > 2:
+            print(strawberry_est)
             strawberry_est = sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     for i in range(2):
