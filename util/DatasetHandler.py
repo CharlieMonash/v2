@@ -28,6 +28,7 @@ class DatasetWriter:
         
         self.t0 = time.time()
         self.image_count = 0
+        self.image_pred_count = 0
     
     def __del__(self):
         self.kb_f.close()
@@ -139,6 +140,17 @@ class OutputWriter:
     def write_image(self, image, slam):
         img_fname = "{}img_{}.png".format(self.folder, self.image_count)
         self.image_count += 1
+        img_dict = {"pose":slam.robot.state.tolist(), "imgfname":img_fname}
+        #img_dict = {"pose":self.robot_pose.tolist(),"imgfname":img_fname}
+        img_line = json.dumps(img_dict)
+        self.img_f.write(img_line+'\n')
+        self.img_f.flush()
+        cv2.imwrite(img_fname, image)
+        return f'img_{self.image_count}.png'
+
+    def write_pred_image(self, image, slam):
+        img_fname = "{}pred_{}.png".format(self.folder, self.image_pred_count)
+        self.image_pred_count += 1
         img_dict = {"pose":slam.robot.state.tolist(), "imgfname":img_fname}
         #img_dict = {"pose":self.robot_pose.tolist(),"imgfname":img_fname}
         img_line = json.dumps(img_dict)

@@ -124,7 +124,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     for target_num in completed_img_dict.keys():
         box = completed_img_dict[target_num]['target'] # [[x],[y],[width],[height]]
         robot_pose = completed_img_dict[target_num]['robot'] # [[x], [y], [theta]]
-        true_height = target_dimensions[target_num-1][2]
+        true_height = target_dimensions[target_num][2]
         
         ######### Replace with your codes #########
         # TODO: compute pose of the target based on bounding box info and robot's pose
@@ -149,7 +149,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
         y_object_world = y_robot + y_object
 
         target_pose = {'y':y_object_world,'x':x_object_world}
-        target_pose_dict[target_list[target_num-1]] = target_pose
+        target_pose_dict[f'{target_list[target_num]}_{i}'] = target_pose
         ###########################################
     
     return target_pose_dict

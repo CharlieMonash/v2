@@ -426,13 +426,13 @@ class Operate:
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
         f1_ = os.path.join(self.folder, f'pred_{self.image_id}.png')
         if self.command['save_image']:
-            image = self.pibot.get_image()
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-            cv2.imwrite(f_, image)
-            self.image_id += 1
-            self.pred_fname = self.output.write_image(image,self.ekf)
-            self.command['save_image'] = False
-            self.notification = f'{f_} is saved'
+            #image = self.pibot.get_image()
+            #image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            #cv2.imwrite(f_, image)
+            #self.image_id += 1
+            #self.pred_fname = self.output.write_image(image,self.ekf)
+            #self.command['save_image'] = False
+            #self.notification = f'{f_} is saved'
 
             self.detector_output, self.network_vis, self.bounding_boxes, pred_count = self.detector.detect_single_image(self.img)
             self.file_output = (self.detector_output, self.ekf)
