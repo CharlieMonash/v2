@@ -418,7 +418,7 @@ class Operate:
         
     def bounding_box_output(self, box_list):
         with open(f'lab_output/pred_{self.pred_count}.txt', "w") as f:
-            json.dump(box_list, f)
+            json.dump(box_list.tolist(), f)
             self.pred_count += 1
 
     # save images taken by the camera
