@@ -259,14 +259,14 @@ class Operate:
         return self.marker_gt, self.taglist, self.P
     """
     def read_true_map(self,fname):
-        """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
+        """"""Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 
         @param fname: filename of the map
         @return:
             1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
             2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
             3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-        """
+        """"""
         with open(fname, 'r') as fd:
             gt_dict = json.load(fd)
             fruit_list = []
