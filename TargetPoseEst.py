@@ -8,14 +8,15 @@ import ast
 # import cv2
 import math
 from machinevisiontoolbox import Image
-from network.scripts.detector import Detector
+#from network.scripts.detector import Detector
 import matplotlib.pyplot as plt
 import PIL
 
 #Defining Yolo place the model weight filepath into the weights_path variable
-weights_path =  'network/scripts/model/best.pt'
-Yolo = Detector(weights_path, use_gpu=False)
+#weights_path =  'network/scripts/model/best.pt'
+#Yolo = Detector(weights_path, use_gpu=False)
 # use the machinevision toolbox to get the bounding box of the detected target(s) in an image
+"""
 def get_bounding_box(target_number, image_path):
     image = PIL.Image.open(image_path).resize((640,480), PIL.Image.NEAREST)
 
@@ -29,8 +30,8 @@ def get_bounding_box(target_number, image_path):
         centre_0 = (yolo_results[i][1]+yolo_results[i][2])/2
         centre_1 = (yolo_results[i][3]+yolo_results[i][4])/2
         box[i] = [centre_0, centre_1, int(width), int(height)]
-
-
+"""
+"""
 def get_bounding_box(self,fruit_select):
     #Multiplying the pixel values by the appropraite scale
     xmin = fruit_select[0] *480/240
@@ -49,7 +50,7 @@ def get_bounding_box(self,fruit_select):
     return (class_converter[fruit], [fruit_xcent,fruit_ycent, fruit_width, fruit_height])
 
     return box
-
+"""
 # read in the list of detection results with bounding boxes and their matching robot pose info
 def get_image_info(base_dir, file_path, image_poses):
     # there are at most five types of targets in each image
