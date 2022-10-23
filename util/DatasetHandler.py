@@ -129,7 +129,7 @@ class OutputWriter:
 
     def write_slam_map(self, slam):
         #map_dict = "{"
-        for i in length(slam.taglist):
+        for i in len(slam.taglist):
             map_dict += {"aruco"+str(slam.taglist[i])+"_0":
                         {"y":slam.markers[i][0],
                         "x":slam.markers[i][1]}}
