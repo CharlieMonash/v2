@@ -150,7 +150,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
             y_object_world = y_robot + y_object
 
             target_pose = {'y':y_object_world,'x':x_object_world}
-            target_pose_dict[f'{target_list[target_num]}_{i}'] = target_pose
+            target_pose_dict[f'{target_list[target_num-1]}_{i}'] = target_pose
             ###########################################
         
     return target_pose_dict
