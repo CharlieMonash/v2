@@ -326,6 +326,7 @@ def merge_estimations(target_pose_dict):
         if len(lemon_est) > 2:
             lemon_est = sort_locations_and_merge(lemon_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
+    print(pear_est)
     if 'pear' in search_list:
         pear_est = np.array([np.mean(pear_est, axis=0)])
     else:
