@@ -476,7 +476,9 @@ class Operate:
     def record_data(self):
         if self.command['output']:
             self.output.write_map(self.ekf)
+            """
             self.output.write_slam_map(self.ekf)
+            """
             self.notification = 'Map of ARUCO markers is saved'
             self.command['output'] = False
         """

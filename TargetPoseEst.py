@@ -376,7 +376,7 @@ def merge_estimations(target_pose_dict):
             pass
     ########################################### 
     return target_est
-
+"""
 def combine_maps(file1, file2, file3):
     with open(file1,'r') as f:
         data = json.load(f)
@@ -386,7 +386,7 @@ def combine_maps(file1, file2, file3):
 
             with open(file3,'w') as f:
                 json.dump(data, f)
-
+"""
 def read_slam_map(self,fname):
     """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 
@@ -442,8 +442,8 @@ if __name__ == "__main__":
     # save target pose estimations
     with open(base_dir/'lab_output/targets.txt', 'w') as fo:
         json.dump(target_est, fo)
-    
+    """
     combine_maps("lab_output/slam_map.txt","lab_output/targets.txt","combined_map.txt")
     print("Combined slam.txt and targets.txt into combined_map.txt")
-
+    """
     print('Estimations saved!')
