@@ -331,7 +331,7 @@ def merge_estimations(target_pose_dict):
         pear_est = np.array([np.mean(pear_est, axis=0)])
     else:
         if len(pear_est) > 2:
-            pear_est = sort_locations_and_merge(pear_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            pear_est = self.sort_locations_and_merge(pear_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     if 'orange' in search_list:
         orange_est = np.array([np.mean(orange_est, axis=0)])
