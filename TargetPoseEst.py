@@ -313,6 +313,7 @@ def merge_estimations(target_pose_dict):
                 orange_est.append(np.array(list(target_map[f][key].values()), dtype=float))
             elif key.startswith('strawberry'):
                 strawberry_est.append(np.array(list(target_map[f][key].values()), dtype=float))
+                #Charlie - somehow doubling up on values in above part
 
     ######### Replace with your codes #########
     # TODO: the operation below takes the first three estimations of each target type, replace it with a better merge solution
@@ -350,7 +351,7 @@ def merge_estimations(target_pose_dict):
     else:
         if len(strawberry_est) > 2:
             print(strawberry_est)
-            strawberry_est = sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            #strawberry_est = sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     for i in range(2):
         try:
