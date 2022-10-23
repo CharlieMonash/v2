@@ -182,7 +182,7 @@ def mean_fruit(fruit_est):
         fruit_est = np.vstack((fruit_est, [y_avg,x_avg]))
     return fruit_est
 
-def merge_to_mean( position_est, remove_outlier = False):
+def merge_to_mean(position_est, remove_outlier = False):
 
     # Inputs:
     # position_est : An numpy array of coordinates {position_est[estimation #][0 = x, 1 = y]}
@@ -295,6 +295,7 @@ def read_search_list():
 # merge the estimations of the targets so that there are at most 3 estimations of each target type
 def merge_estimations(target_pose_dict):
     target_map = target_pose_dict
+    print(target_map)
     apple_est, lemon_est, pear_est, orange_est, strawberry_est = [], [], [], [], []
     target_est = {}
     
