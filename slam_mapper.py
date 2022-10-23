@@ -151,7 +151,10 @@ class Operate:
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
             self.ekf.update(lms)
-    """
+
+
+
+    #Target Pose Est
     def get_bounding_box(self,fruit_select):
         #Multiplying the pixel values by the appropraite scale
         xmin = fruit_select[0] *480/240
@@ -412,21 +415,15 @@ class Operate:
                     #increment dictionary index
                     self.dict_idx +=1
         
-    """
-        # using computer vision to detect targets
-    def detect_target(self):
-        if self.command['inference'] and self.detector is not None:
-            self.detector_output, self.network_vis,self.bound_boxes,self.raw_boxes = self.detector.detect_single_image(self.img)
-            self.command['inference'] = False
-            self.file_output = (self.detector_output, self.ekf)
-            #self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
-            self.notification = f'{self.network_vis.shape[0]} target type(s) detected'
-    """
-    """
-    
+    def bounding_box_output(self, box_list):
+        with open(f'lab_output/pred_{self.pred_count}.txt', "w") as f:
+            json.dump(box_list, f)
+            self.pred_count += 1
+
     # save images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
+        f1_ = os.path.join(self.folder, f'pred_{self.image_id}.png')
         if self.command['save_image']:
             image = self.pibot.get_image()
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -435,6 +432,16 @@ class Operate:
             self.pred_fname = self.output.write_image(image,self.ekf)
             self.command['save_image'] = False
             self.notification = f'{f_} is saved'
+
+            self.detector_output, self.network_vis, self.bounding_boxes, pred_count = self.detector.detect_single_image(self.img)
+            self.file_output = (self.detector_output, self.ekf)
+            self.notification = f'{pred_count} fruits detected'
+            image = cv2.cvtColor(self.file_output[0], cv2.COLOR_BGR2RGB)
+            self.pred_fname = self.output.write_image(image,self.file_output[1])
+            self.bounding_box_output(self.bounding_boxes) #save bounding box text file
+            self.notification = f'Prediction is saved to pred_{self.pred_count-1}.png'
+
+
 
     # wheel and camera calibration for SLAM
     def init_ekf(self, datadir, ip):
@@ -451,7 +458,7 @@ class Operate:
         robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
         return EKF(robot)
 
-    """
+    
     def read_fruit_data(self):
         if self.command['read_inference']:
             target_map = self.estimate_pose()
@@ -462,7 +469,7 @@ class Operate:
                 json.dump(target_est, fo)
             self.notification = 'Fruit Locations Saved'
             self.command['read_inference'] = False
-    """
+    
     # save SLAM map
     def record_data(self):
         if self.command['output']:
@@ -555,6 +562,7 @@ class Operate:
             # save SLAM map
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.command['output'] = True
+            """
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 self.command['inference'] = True
             # save object detection outputs
@@ -563,6 +571,7 @@ class Operate:
             # AFR
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 self.command['read_inference'] = True
+            """
             # quit
             # reset SLAM map
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:

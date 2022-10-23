@@ -18,31 +18,10 @@ Yolo = Detector(weights_path, use_gpu=False)
 # use the machinevision toolbox to get the bounding box of the detected target(s) in an image
 def get_bounding_box(target_number, image_path):
     image = PIL.Image.open(image_path).resize((640,480), PIL.Image.NEAREST)
-    target = Image(image)==target_number
-    """
-    blobs = target.blobs()
-    [[u1,u2],[v1,v2]] = blobs[0].bbox # bounding box
-    width = abs(u1-u2)
-    height = abs(v1-v2)
-    center = np.array(blobs[0].centroid).reshape(2,)
-    box = [center[0], center[1], int(width), int(height)] # box=[x,y,width,height]
-    """
-    # plt.imshow(fruit.image)
-    # plt.annotate(str(fruit_number), np.array(blobs[0].centroid).reshape(2,))
-    # plt.show()
-    # assert len(blobs) == 1, "An image should contain only one object of each target type"
-    #Pssing the image through the network
+
     _,_,yolo_results,_= Yolo.detect_single_image(image)
-    #Creating the box from the yellow results
-    #print(yolo_results)
-    shapes = yolo_results.shape
-    """
-    for i in range(shapes[0])
-        width = abs(yolo_results[i][1]-yolo_results[i][2])
-        height = abs(yolo_results[i][3]-yolo_results[i][4])
-        center = np.array([(yolo_results[i][1]+yolo_results[i][2])/2,(yolo_results[i][3]+yolo_results[i][4])/2])
-        box = [center[0], center[1], int(width), int(height)]
-    """
+
+
     box = np.zeros((yolo_results.shape[0],4))
     for i in range(yolo_results.shape[0]):
         width = abs(yolo_results[i][1]-yolo_results[i][2])
@@ -50,6 +29,25 @@ def get_bounding_box(target_number, image_path):
         centre_0 = (yolo_results[i][1]+yolo_results[i][2])/2
         centre_1 = (yolo_results[i][3]+yolo_results[i][4])/2
         box[i] = [centre_0, centre_1, int(width), int(height)]
+
+
+def get_bounding_box(self,fruit_select):
+    #Multiplying the pixel values by the appropraite scale
+    xmin = fruit_select[0] *480/240
+    ymin = fruit_select[1] *640/320
+    xmax = fruit_select[2] *480/240
+    ymax = fruit_select[3] *640/240
+    fruit = fruit_select[5]
+
+    fruit_xcent = (xmin + xmax)/2
+    fruit_ycent = (ymin + ymax)/2 
+    fruit_width = xmax - xmin
+    fruit_height = ymax - ymin
+
+    class_converter = {0:1,1:3,2:4,3:5,4:2}
+
+    return (class_converter[fruit], [fruit_xcent,fruit_ycent, fruit_width, fruit_height])
+
     return box
 
 # read in the list of detection results with bounding boxes and their matching robot pose info
@@ -101,6 +99,7 @@ def get_image_info(base_dir, file_path, image_poses):
             completed_img_dict[i+1] = {'target': box, 'robot': pose}
     return completed_img_dict
 
+
 # estimate the pose of a target based on size and location of its bounding box in the robot's camera view and the robot's pose
 def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     camera_matrix = camera_matrix
@@ -144,7 +143,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
         theta_camera = np.arctan(x_camera/focal_length)
         theta_total = theta_robot + theta_camera
 
-        y_object = A * np.cos(theta_total)
+        y_object = A * np.sin(theta_total)
         x_object = A * np.cos(theta_total)
         
         x_object_world = x_robot + x_object
@@ -183,10 +182,115 @@ def mean_fruit(fruit_est):
         fruit_est = np.vstack((fruit_est, [y_avg,x_avg]))
     return fruit_est
 
+def merge_to_mean(self,position_est, remove_outlier = False):
+
+    # Inputs:
+    # position_est : An numpy array of coordinates {position_est[estimation #][0 = x, 1 = y]}
+    # remove_outlier : Boolean (Remove outliers using Standard Distribution z-scores)
+    # Outputs:
+    # new_mean : An numpy array of coordinates {new_mean[0 = x, 1 = y]}
+
+    # Check if the position_est has no elements
+    if len(position_est) == 0:
+        return None
+
+    # Set up working parameters
+    position_est_result = []
+    z_threshold = 3
+
+    # Compute mean and standard deviations
+    means = np.mean(position_est, axis = 0)
+    stds = np.std(position_est, axis = 0)
+    mean_x = means[0]
+    std_x = stds[0]
+    mean_y = means[1]
+    std_y = stds[1]
+    
+    # Remove outliers
+    if remove_outlier:
+        for i in range(len(position_est)):
+            coordinates = position_est[i]
+            z_score_x = (coordinates[0] - mean_x)/std_x
+            z_score_y = (coordinates[1] - mean_y)/std_y
+            if np.abs(z_score_x) > z_threshold or np.abs(z_score_y) > z_threshold:
+                position_est_result.append(coordinates)
+    else:
+        position_est_result = position_est
+
+    # Compute Mean
+    new_mean = np.mean(position_est_result, axis = 0)
+
+    return new_mean
+
+def sort_locations_and_merge(self,position_est, distance_threshold = 0.3, remove_outlier = False, use_Kmeans = False):
+
+    # Inputs:
+    # position_est : An numpy array of coordinates {position_est[estimation #][0 = x, 1 = y]}
+    # distance_threshold : the distance assumption that two fruits of the same type will be apart for
+    # remove_outlier : Boolean (Remove outliers using Standard Distribution z-scores)
+    # Outputs:
+    # new_mean : An numpy array of coordinates {new_mean[0 = x, 1 = y]}
+
+    # Initialize two sets of position estimations for each fruit of the same type
+    position_est1 = []
+    position_est2 = []
+
+    # Sort data
+    for i in range(len(position_est)):
+
+        if(use_Kmeans):
+
+            kmeans = KMeans(n_clusters = 2)
+            kmeans.fit(position_est)
+            if(kmeans.labels_[i] == 0):
+                position_est1.append(position_est[i])
+            else:
+                position_est2.append(position_est[i])
+
+        else:
+
+            if(i == 0): # Take the first position estimation as the reference for the first fruit
+                position_est1.append(position_est[i])
+                continue
+            else:
+                coordinates = position_est[i]
+                x_distance = np.abs(coordinates[0] - position_est[0][0])
+                y_distance = np.abs(coordinates[1] - position_est[0][1])
+                distance = np.sqrt(x_distance ** 2 + y_distance ** 2)
+                if(distance < distance_threshold):
+                    position_est1.append(coordinates)
+                else:
+                    position_est2.append(coordinates)
+
+    # Merge position estimations
+    position1 = self.merge_to_mean(position_est1, remove_outlier)
+    position2 = self.merge_to_mean(position_est2, remove_outlier)
+
+    # return the position estimations
+    positions = []
+    if(position1 is not None):
+        positions.append(position1)
+    if(position2 is not None):
+        positions.append(position2)
+    return positions
+
+def read_search_list():
+    """Read the search order of the target fruits
+
+    @return: search order of the target fruits
+    """
+    search_list = []
+    with open(search_list.txt, 'r') as fd:
+        fruits = fd.readlines()
+
+        for fruit in fruits:
+            search_list.append(fruit.strip())
+
+    return search_list
 
 # merge the estimations of the targets so that there are at most 3 estimations of each target type
-def merge_estimations(target_pose_dict):
-    target_pose_dict = target_pose_dict
+def merge_estimations(self,target_pose_dict):
+    target_map = target_pose_dict
     apple_est, lemon_est, pear_est, orange_est, strawberry_est = [], [], [], [], []
     target_est = {}
     
@@ -206,16 +310,39 @@ def merge_estimations(target_pose_dict):
 
     ######### Replace with your codes #########
     # TODO: the operation below takes the first three estimations of each target type, replace it with a better merge solution
-    if len(apple_est) > 2:
-        apple_est = mean_fruit(apple_est)
-    if len(lemon_est) > 2:
-        lemon_est = mean_fruit(lemon_est)
-    if len(pear_est) > 2:
-        pear_est = mean_fruit(pear_est)
-    if len(orange_est) > 2:
-        orange_est = mean_fruit(orange_est)
-    if len(strawberry_est) > 2:
-        strawberry_est = mean_fruit(strawberry_est)
+    remove_outlier = False
+    use_Kmeans = False
+    search_list = read_search_list()
+
+    if 'apple' in search_list:
+        apple_est = np.array([np.mean(apple_est, axis=0)])
+    else:
+        if len(apple_est) > 2:
+            apple_est = self.sort_locations_and_merge(apple_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+    
+    if 'lemon' in search_list:
+        lemon_est = np.array([np.mean(lemon_est, axis=0)])
+    else:
+        if len(lemon_est) > 2:
+            lemon_est = self.sort_locations_and_merge(lemon_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+
+    if 'pear' in search_list:
+        pear_est = np.array([np.mean(pear_est, axis=0)])
+    else:
+        if len(pear_est) > 2:
+            pear_est = self.sort_locations_and_merge(pear_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+
+    if 'orange' in search_list:
+        orange_est = np.array([np.mean(orange_est, axis=0)])
+    else:
+        if len(orange_est) > 2:
+            orange_est = self.sort_locations_and_merge(orange_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+
+    if 'strawberry' in search_list:
+        strawberry_est = np.array([np.mean(strawberry_est, axis=0)])
+    else:
+        if len(strawberry_est) > 2:
+            strawberry_est = self.sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
 
     for i in range(2):
         try:
@@ -238,9 +365,9 @@ def merge_estimations(target_pose_dict):
             target_est['strawberry_'+str(i)] = {'y':strawberry_est[i][0], 'x':strawberry_est[i][1]}
         except:
             pass
-    ###########################################
-        
+    ########################################### 
     return target_est
+
 
 
 if __name__ == "__main__":
