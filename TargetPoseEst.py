@@ -389,7 +389,8 @@ if __name__ == "__main__":
         for line in fp.readlines():
             pose_dict = ast.literal_eval(line)
             image_poses[pose_dict['imgfname']] = pose_dict['pose']
-    
+    print("Image Poses")
+    print(image_poses)
     # estimate pose of targets in each detector output
     target_map = {}        
     for file_path in image_poses.keys():
