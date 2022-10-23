@@ -562,16 +562,7 @@ class Operate:
             # save SLAM map
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.command['output'] = True
-            """
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                self.command['inference'] = True
-            # save object detection outputs
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
-                self.command['save_inference'] = True
-            # AFR
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                self.command['read_inference'] = True
-            """
+    
             # quit
             # reset SLAM map
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
@@ -609,6 +600,18 @@ class Operate:
         if self.quit:
             pygame.quit()
             sys.exit()
+
+
+            """
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                self.command['inference'] = True
+            # save object detection outputs
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
+                self.command['save_inference'] = True
+            # AFR
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                self.command['read_inference'] = True
+            """
 
     def drive_robot(self):
         waypoint_x = self.wp[0]
