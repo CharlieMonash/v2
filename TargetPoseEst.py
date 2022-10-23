@@ -195,6 +195,7 @@ def merge_to_mean(self,position_est, remove_outlier = False):
     #    return None
 
     # Set up working parameters
+    position_est = np.array(position_est)
     position_est_result = []
     z_threshold = 3
 
