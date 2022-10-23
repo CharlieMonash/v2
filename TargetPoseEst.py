@@ -117,7 +117,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     strawberry_dimensions = [0.052, 0.0346, 0.0376]
     target_dimensions.append(strawberry_dimensions)
 
-    target_list = ['apple', 'lemon', 'pear', 'orange', 'strawberry']
+    target_list = ['apple', 'lemon', 'orange', 'pear', 'strawberry']
 
     target_pose_dict = {}
     # for each target in each detection output, estimate its pose
