@@ -397,7 +397,7 @@ if __name__ == "__main__":
 
     # merge the estimations of the targets so that there are at most 3 estimations of each target type
     target_est = merge_estimations(target_map)
-                     
+    print(target_est)
     # save target pose estimations
     with open(base_dir/'lab_output/targets.txt', 'w') as fo:
         json.dump(target_est, fo)
