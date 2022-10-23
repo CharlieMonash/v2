@@ -196,13 +196,13 @@ def merge_to_mean(position_est, remove_outlier = False):
 
     # Set up working parameters
     position_est = np.array(position_est)
-    print("Position Est")
-    print(position_est)
+
     position_est_result = []
     z_threshold = 3
 
     # Compute mean and standard deviations
     means = np.mean(position_est, axis = 0)
+    print(means)
     stds = np.std(position_est, axis = 0)
     mean_x = means[0]
     std_x = stds[0]
@@ -238,6 +238,9 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
     position_est1 = []
     position_est2 = []
     position_est = np.array(position_est)
+
+    print("Position Est")
+    print(position_est)
 
     # Sort data
     for i in range(len(position_est)):
