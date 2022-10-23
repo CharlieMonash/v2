@@ -128,12 +128,10 @@ class OutputWriter:
             json.dump(map_dict, map_f, indent=2)
 
     def write_slam_map(self, slam):
-        #map_dict = "{"
+        map_dict = {}
         for i in range(len(slam.taglist)):
-            map_dict += {"aruco"+str(slam.taglist[i])+"_0":
-                        {"y":slam.markers[i][0],
-                        "x":slam.markers[i][1]}}
-        #map_dict += "}"
+            name = "aruco"+str(slam.taglist[i])+"_0"
+            map_dict[name] = {"y":slam.markers[i][0],"x":slam.markers[i][1]}
         with open(self.map_slam, 'w') as map_slam:
             json.dump(map_dict, map_slam, indent=2)
             
