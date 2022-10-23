@@ -182,7 +182,7 @@ def mean_fruit(fruit_est):
         fruit_est = np.vstack((fruit_est, [y_avg,x_avg]))
     return fruit_est
 
-def merge_to_mean(self,position_est, remove_outlier = False):
+def merge_to_mean(self, position_est, remove_outlier = False):
 
     # Inputs:
     # position_est : An numpy array of coordinates {position_est[estimation #][0 = x, 1 = y]}
@@ -196,6 +196,8 @@ def merge_to_mean(self,position_est, remove_outlier = False):
 
     # Set up working parameters
     position_est = np.array(position_est)
+    print("Position Est")
+    print(position_est)
     position_est_result = []
     z_threshold = 3
 
