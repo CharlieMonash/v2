@@ -129,6 +129,7 @@ class Operate:
         drive_meas = measure.Drive(lv, rv, dt)
         self.control_clock = time.time()
         return drive_meas
+
     # camera control
     def take_pic(self):
         self.img = self.pibot.get_image()
@@ -152,9 +153,7 @@ class Operate:
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
             self.ekf.update(lms)
-
-
-
+    """
     #Target Pose Est
     def get_bounding_box(self,fruit_select):
         #Multiplying the pixel values by the appropraite scale
@@ -380,7 +379,8 @@ class Operate:
                 pass
         ########################################### 
         return target_est
-    
+    """
+    """
     # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -415,7 +415,7 @@ class Operate:
                     self.completed_img_dict[self.dict_idx+1] = {'target': box, 'robot': pose}
                     #increment dictionary index
                     self.dict_idx +=1
-        
+    """  
     def bounding_box_output(self, box_list):
         with open(f'lab_output/img_{self.pred_count}.txt', "w") as f: #Chane thye a back to w if it does not fix it
             json.dump(box_list, f)
@@ -459,7 +459,7 @@ class Operate:
         robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
         return EKF(robot)
 
-    
+    """
     def read_fruit_data(self):
         if self.command['read_inference']:
             target_map = self.estimate_pose()
@@ -470,13 +470,16 @@ class Operate:
                 json.dump(target_est, fo)
             self.notification = 'Fruit Locations Saved'
             self.command['read_inference'] = False
+    """
     
     # save SLAM map
     def record_data(self):
         if self.command['output']:
             self.output.write_map(self.ekf)
+            self.output.write_slam_map(self.ekf)
             self.notification = 'Map of ARUCO markers is saved'
             self.command['output'] = False
+        """
         # save inference with the matching robot pose and detector labels
         if self.command['save_inference']:
             image = cv2.cvtColor(self.pibot.get_image(), cv2.COLOR_RGB2BGR)
@@ -484,6 +487,7 @@ class Operate:
             self.notification = f'Prediction is saved to {operate.pred_fname}'
             self.command['save_inference'] = False
             #Writing the bounding boxes and pose to a file
+        """
 
     # paint the GUI            
     def draw(self, canvas):

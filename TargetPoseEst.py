@@ -374,7 +374,43 @@ def merge_estimations(target_pose_dict):
     ########################################### 
     return target_est
 
+def combine_maps(file1, file2, file3):
+    with open(file1,'r') as f:
+        data = json.load(f)
 
+        with open(file2,'r') as f:
+            data.update(json.load(f))
+
+            with open(file3,'w') as f:
+                json.dump(data, f)
+
+def read_slam_map(self,fname):
+    """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
+
+    @param fname: filename of the map
+    @return:
+        1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
+        2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
+        3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
+    """
+    with open(fname, 'r') as fd:
+        gt_dict = json.load(fd)
+        slam_pos = np.zeros([10,2])
+        i=0
+        # remove unique id of targets of the same type
+        for key in gt_dict["taglist"]:
+            
+            slam_pos[key-1,0] = np.round(gt_dict["map"][0][i], 1)
+            slam_pos[key-1,1] = np.round(gt_dict["map"][1][i], 1)
+            i+=1
+            #marker_id = int(gt_dict["taglist"][key])
+            
+            #aruco_true_pos[marker_id-1][0] = x
+            #aruco_true_pos[marker_id-1][1] = y
+
+        #slam_pos = delette row if all zeros
+        #Charlie - doesnt work properly if doesnt have all ten markers!
+        return slam_pos
 
 if __name__ == "__main__":
     # camera_matrix = np.ones((3,3))/2
@@ -404,4 +440,7 @@ if __name__ == "__main__":
     with open(base_dir/'lab_output/targets.txt', 'w') as fo:
         json.dump(target_est, fo)
     
+    combine_maps("lab_output/slam_map.txt","lab_output/targets.txt","combined_map.txt")
+    print("Combined slam.txt and targets.txt into combined_map.txt")
+
     print('Estimations saved!')

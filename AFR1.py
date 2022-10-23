@@ -123,12 +123,13 @@ class Operate:
         drive_meas = measure.Drive(lv, rv, dt)
         self.clock = time.time()
         return drive_meas
+    """
     # camera control
     def take_pic(self):
         self.img = self.pibot.get_image()
         if not self.data is None:
             self.data.write_image(self.img)
-
+    """
     def detect_fruit_pos(self, dictionary):
         measurements = []
         for fruit in dictionary.keys():
@@ -179,7 +180,7 @@ class Operate:
             self.file_output = (self.detector_output, self.ekf)
             # self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
             self.notification = f'{pred_count} fruits detected'
-
+    """
     # save raw images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
@@ -190,7 +191,7 @@ class Operate:
             self.image_id += 1
             self.command['save_image'] = False
             self.notification = f'{f_} is saved'
-
+    """
     # wheel and camera calibration for SLAM
     def init_ekf(self, datadir, ip):
         fileK = "{}intrinsic.txt".format(datadir)
@@ -205,14 +206,15 @@ class Operate:
         baseline = np.loadtxt(fileB, delimiter=',')
         robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
         return EKF(robot)
-
+    """
     # function to save bounding box info
     def bounding_box_output(self, box_list):
         import json
         with open(f'lab_output/pred_{self.pred_count}.txt', "w") as f:
             json.dump(box_list, f)
             self.pred_count += 1
-
+    """
+    """
     # save SLAM map
     def record_data(self):
         if self.command['output']:
@@ -230,7 +232,7 @@ class Operate:
             else:
                 self.notification = f'No prediction in buffer, save ignored'
             self.command['save_inference'] = False
-
+    """
     def parse_slam_map(self, fruit_list, fruits_true_pos, aruco_true_pos):
 
         #adding known aruco markers
@@ -255,7 +257,7 @@ class Operate:
             self.P[-2,-2] = self.init_lm_cov**2
             self.P[-1,-1] = self.init_lm_cov**2
         return self.marker_gt, self.taglist, self.P
-
+    """
     def read_true_map(self,fname):
         """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 
@@ -292,7 +294,7 @@ class Operate:
                         fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
 
             return fruit_list, fruit_true_pos, aruco_true_pos
-
+    """
     def read_slam_map(self,fname):
         """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 

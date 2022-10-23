@@ -92,8 +92,8 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser("Matching the estimated map and the true map")
-    parser.add_argument("groundtruth", type=str, help="The ground truth file name.")
-    parser.add_argument("estimate", type=str, help="The estimate file name.")
+    parser.add_argument("groundtruth", type=str, default="maps/7fruits_practice_map_1.txt")
+    parser.add_argument("estimate", type=str, default="lab_output/slam_map.txt")
     args = parser.parse_args()
 
     gt_aruco = parse_groundtruth(args.groundtruth)
