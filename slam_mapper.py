@@ -5,6 +5,7 @@ from pickle import FALSE, TRUE
 import numpy as np
 import cv2 
 import os, sys
+import glob
 import time
 
 # import utility functions
@@ -747,6 +748,10 @@ if __name__ == "__main__":
                     pygame.image.load('pics/8bit/pibot4.png'),
                      pygame.image.load('pics/8bit/pibot5.png')]
     pygame.display.update()
+
+    files = glob.glob('lab_output/*')
+    for f in files:
+        os.remove(f)
 
     start = False
 
