@@ -199,7 +199,7 @@ class Operate:
             rrt1 = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
                     expand_dis=1, path_resolution=0.5)
             path = rrt1.planning()[::-1] #reverse path
-
+            print('RRT done',idx)
             #printing path
             for i in range(len(path)):
                 x, y = path[i]
