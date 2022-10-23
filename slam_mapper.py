@@ -431,7 +431,7 @@ class Operate:
             #cv2.imwrite(f_, image)
             #self.image_id += 1
             #self.pred_fname = self.output.write_image(image,self.ekf)
-            #self.command['save_image'] = False
+            self.command['save_image'] = False
             #self.notification = f'{f_} is saved'
 
             self.detector_output, self.network_vis, self.bounding_boxes, pred_count = self.detector.detect_single_image(self.img)
