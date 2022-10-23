@@ -122,36 +122,38 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     target_pose_dict = {}
     # for each target in each detection output, estimate its pose
     for target_num in completed_img_dict.keys():
-        box = completed_img_dict[target_num]['target'] # [[x],[y],[width],[height]]
-        robot_pose = completed_img_dict[target_num]['robot'] # [[x], [y], [theta]]
-        true_height = target_dimensions[target_num][2]
-        
-        ######### Replace with your codes #########
-        # TODO: compute pose of the target based on bounding box info and robot's pose
-        target_pose = {'y': 0.0, 'x': 0.0}
-        
-        cam_res = 640 # camera resolution in pixels
+        for i in range(len(completed_img_dict[target_num]['target'][0])):
 
-        A = focal_length * true_height / box[3][0] # actual depth of object
- 
-        x_robot = robot_pose[0][0]
-        y_robot = robot_pose[1][0]
-        theta_robot = robot_pose[2][0]
+            box = completed_img_dict[target_num]['target'] # [[x],[y],[width],[height]]
+            robot_pose = completed_img_dict[target_num]['robot'] # [[x], [y], [theta]]
+            true_height = target_dimensions[target_num][2]
+            
+            ######### Replace with your codes #########
+            # TODO: compute pose of the target based on bounding box info and robot's pose
+            target_pose = {'y': 0.0, 'x': 0.0}
+            
+            cam_res = 640 # camera resolution in pixels
 
-        x_camera = cam_res/2 - box[0][0]
-        theta_camera = np.arctan(x_camera/focal_length)
-        theta_total = theta_robot + theta_camera
-
-        y_object = A * np.sin(theta_total)
-        x_object = A * np.cos(theta_total)
-        
-        x_object_world = x_robot + x_object
-        y_object_world = y_robot + y_object
-
-        target_pose = {'y':y_object_world,'x':x_object_world}
-        target_pose_dict[f'{target_list[target_num]}_{i}'] = target_pose
-        ###########################################
+            A = focal_length * true_height / box[3][0] # actual depth of object
     
+            x_robot = robot_pose[0][0]
+            y_robot = robot_pose[1][0]
+            theta_robot = robot_pose[2][0]
+
+            x_camera = cam_res/2 - box[0][0]
+            theta_camera = np.arctan(x_camera/focal_length)
+            theta_total = theta_robot + theta_camera
+
+            y_object = A * np.sin(theta_total)
+            x_object = A * np.cos(theta_total)
+            
+            x_object_world = x_robot + x_object
+            y_object_world = y_robot + y_object
+
+            target_pose = {'y':y_object_world,'x':x_object_world}
+            target_pose_dict[f'{target_list[target_num]}_{i}'] = target_pose
+            ###########################################
+        
     return target_pose_dict
 
 # EXTRA: to changes

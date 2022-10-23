@@ -36,6 +36,7 @@ class Detector:
         pred_results = np.zeros((num_preds,5))
         #Going throuch prediction and gettring the bounding box and class prediction
         #file_result = open('fruit_estimates/fruit_boxes.txt', 'a')
+        results = []
         for i in range(num_preds):
             #Get the class
             predic_class = int(pred.pandas().xyxy[0]["class"][i])
@@ -47,9 +48,9 @@ class Detector:
             yu = pred.pandas().xyxy[0]['ymax'][i]
             pred_results[i,:] = np.array([predic_class,xl,xu,yl,yu])
             #Writing the bounding boxes to a text file 
-            stored_result = np.array([predic_class,probability,xl,xu,yl,yu])
+            results.append({'xmin':xmin, 'ymin':ymin, 'xmax':xmax, 'ymax':ymax, 'name':name, 'class': class_no})
         #Save all the predictions to a file with the boxes
         boxes = pred.pandas().xyxy[0]
-        return np.squeeze(pred.render()),np.squeeze(pred.render()),pred_results,boxes
+        return np.squeeze(pred.render()),np.squeeze(pred.render()),results,boxes
 
 
