@@ -14,8 +14,8 @@ from util.pibot import PenguinPi # access the robot
 import util.DatasetHandler as dh # save/load functions
 import util.measure as measure # measurements
 import pygame # python package for GUI
-import shutil # python package for file operations
-import copy
+#import shutil # python package for file operations
+#import copy
 from pathlib import Path
 
 # import SLAM components
@@ -25,9 +25,9 @@ from slam.robot import Robot
 import slam.aruco_detector as aruco
 
 # import components for the detector
-import torch
+#import torch
 import json
-from sklearn.cluster import KMeans
+#from sklearn.cluster import KMeans
 from network.scripts.detector import Detector
 
 class Operate:
@@ -170,8 +170,6 @@ class Operate:
             self.pred_fname = self.output.write_image(image,self.file_output[1])
             self.bounding_box_output(self.bounding_boxes) #save bounding box text file
             self.notification = f'Prediction is saved to pred_{self.pred_count-1}.png'
-
-
 
     # wheel and camera calibration for SLAM
     def init_ekf(self, datadir, ip):
@@ -317,18 +315,6 @@ class Operate:
             pygame.quit()
             sys.exit()
 
-
-            """
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                self.command['inference'] = True
-            # save object detection outputs
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
-                self.command['save_inference'] = True
-            # AFR
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                self.command['read_inference'] = True
-            """
-
     def drive_robot(self):
         waypoint_x = self.wp[0]
         waypoint_y = self.wp[1]
@@ -453,12 +439,12 @@ if __name__ == "__main__":
                      pygame.image.load('pics/8bit/pibot5.png')]
     pygame.display.update()
 
+    # delete old lab_output files
     files = glob.glob('lab_output/*')
     for f in files:
         os.remove(f)
 
     start = False
-
     counter = 40
     while not start:
         for event in pygame.event.get():
@@ -472,7 +458,6 @@ if __name__ == "__main__":
             counter += 2
 
     operate = Operate(args)
-
     while start:
         operate.update_keyboard()
         operate.take_pic()
