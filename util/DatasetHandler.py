@@ -131,7 +131,7 @@ class OutputWriter:
         map_dict = {}
         for i in range(len(slam.taglist)):
             name = "aruco"+str(slam.taglist[i])+"_0"
-            map_dict[name] = {"y":slam.markers[0][i],"x":slam.markers[0][i]}
+            map_dict[name] = {"y":slam.markers[0][i],"x":slam.markers[1][i]}
         with open(self.map_slam, 'w') as map_slam:
             json.dump(map_dict, map_slam, indent=2)
             
