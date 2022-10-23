@@ -480,6 +480,10 @@ class Operate:
             self.output.write_slam_map(self.ekf)
             """
             self.notification = 'Map of ARUCO markers is saved'
+            import TargetPoseEst
+            execfile('TargetPoseEst.py')
+            import mapping_eval
+            execfile('mapping_eval.py')
             self.command['output'] = False
         """
         # save inference with the matching robot pose and detector labels
