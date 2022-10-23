@@ -191,8 +191,8 @@ def merge_to_mean(self,position_est, remove_outlier = False):
     # new_mean : An numpy array of coordinates {new_mean[0 = x, 1 = y]}
 
     # Check if the position_est has no elements
-    if len(position_est) == 0:
-        return None
+    #if len(position_est) == 0:
+    #    return None
 
     # Set up working parameters
     position_est_result = []
