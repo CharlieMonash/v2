@@ -235,6 +235,7 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
     # Initialize two sets of position estimations for each fruit of the same type
     position_est1 = []
     position_est2 = []
+    position_est = np.array(position_est)
 
     # Sort data
     for i in range(len(position_est)):

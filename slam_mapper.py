@@ -417,7 +417,7 @@ class Operate:
                     self.dict_idx +=1
         
     def bounding_box_output(self, box_list):
-        with open(f'lab_output/img_{self.pred_count}.txt', "a") as f: #Chane thye a back to w if it does not fix it
+        with open(f'lab_output/img_{self.pred_count}.txt', "w") as f: #Chane thye a back to w if it does not fix it
             json.dump(box_list, f)
             self.pred_count += 1
 
