@@ -481,9 +481,9 @@ class Operate:
             """
             self.notification = 'Map of ARUCO markers is saved'
             import TargetPoseEst
-            execfile('TargetPoseEst.py')
+            #execfile('TargetPoseEst.py')
             import mapping_eval
-            execfile('mapping_eval.py')
+            #execfile('mapping_eval.py')
             self.command['output'] = False
         """
         # save inference with the matching robot pose and detector labels
