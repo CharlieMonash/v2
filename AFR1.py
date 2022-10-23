@@ -397,9 +397,9 @@ class Operate:
         grey = pygame.Color(220,220,220)
         purple = pygame.Color(128,0,128)
 
-        print("Draw")
-        print(self.fruit_true_pos)
-        print(self.fruit_list)
+        #print("Draw")
+        #print(self.fruit_true_pos)
+        #print(self.fruit_list)
 
         #Painting Marker positions on the grid
         for marker in self.aruco_true_pos:
