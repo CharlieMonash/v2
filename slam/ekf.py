@@ -159,6 +159,9 @@ class EKF:
         motion_check = raw_drive_meas.left_speed+raw_drive_meas.right_speed
         if motion_check !=0:
             Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.01*np.eye(3)
+        else:
+            Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) 
+
         return Q
 
     def add_landmarks(self, measurements):
