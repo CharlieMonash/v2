@@ -27,10 +27,10 @@ def get_image_info(base_dir, file_path, image_poses):
     with open(text_file_path,"r") as f:
         data = json.load(f)
         for fruit in data:
-            xmin = fruit['xmin']*2
-            ymin = fruit['ymin']*2
-            xmax = fruit['xmax']*2
-            ymax = fruit['ymax']*2
+            xmin = fruit['xmin']
+            ymin = fruit['ymin']
+            xmax = fruit['xmax']
+            ymax = fruit['ymax']
             x = (xmin + xmax)/2
             y = (ymin + ymax)/2
             width = xmax - xmin
