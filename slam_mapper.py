@@ -110,6 +110,7 @@ class Operate:
         self.tagret_pose_dict ={}
         self.grid = cv2.imread('grid.png')
         self.raw_boxes=[]
+        self.update_flag = True
 
         #Setting a condition for slam to map
         self.SLAM_DONE =FALSE
@@ -150,7 +151,8 @@ class Operate:
         elif self.ekf_on: # and not self.debug_flag:
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
-            self.ekf.update(lms)
+            if self.update_flag:
+                self.ekf.update(lms)
  
     def bounding_box_output(self, box_list):
         with open(f'lab_output/img_{self.pred_count}.txt', "w") as f: #Chane thye a back to w if it does not fix it
@@ -160,7 +162,6 @@ class Operate:
     # save images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
-        f1_ = os.path.join(self.folder, f'pred_{self.image_id}.png')
         if self.command['save_image']:
             self.command['save_image'] = False
             self.detector_output, self.network_vis, self.bounding_boxes, pred_count = self.detector.detect_single_image(self.img)
@@ -190,12 +191,7 @@ class Operate:
     def record_data(self):
         if self.command['output']:
             self.output.write_map(self.ekf)
-            """
-            self.output.write_slam_map(self.ekf)
-            """
             self.notification = 'Map of ARUCO markers is saved'
-            import TargetPoseEst
-            import mapping_eval
             self.command['output'] = False
 
     # paint the GUI            
@@ -314,100 +310,7 @@ class Operate:
         if self.quit:
             pygame.quit()
             sys.exit()
-
-    def drive_robot(self):
-        waypoint_x = self.wp[0]
-        waypoint_y = self.wp[1]
-        #Updating the robots psoe
-        self.robot_pose = self.ekf.get_state_vector()
-        robot_x = self.robot_pose[0]
-        robot_y = self.robot_pose[1]
-
-        self.distance = np.sqrt((waypoint_x-robot_x)**2 + (waypoint_y-robot_y)**2) #calculates distance between robot and waypoint
-
-        robot_theta = self.robot_pose[2]
-        waypoint_angle = np.arctan2((waypoint_y-robot_y),(waypoint_x-robot_x))
-        theta1 = robot_theta - waypoint_angle
-        if waypoint_angle < 0:
-            theta2 = robot_theta - waypoint_angle - 2*np.pi
-        else:
-            theta2 = robot_theta - waypoint_angle + 2*np.pi
-
-        if abs(theta1) > abs(theta2):
-            self.theta_error = theta2
-        else:
-            self.theta_error = theta1
-
-        if self.forward == False:
-            #Update turning tick speed depending on theta_error to waypoint
-            self.turning_tick = int(abs(5 * self.theta_error) + 3)
-            if self.theta_error > 0:
-                self.command['motion'] = [0,-1]
-                self.notification = 'Robot is turning right'
-
-            if self.theta_error < 0:
-                self.command['motion'] = [0,1]
-                self.notification = 'Robot is turning left'
-
-        # stop turning if less than threshold
-        if not self.forward:
-            if abs(self.theta_error)  < 0.05:
-                self.command['motion'] = [0,0]
-                self.notification = 'Robot stopped turning'
-                self.forward = True #go forward now
-                return
-
-        #Driving forward
-        if self.forward:
-            #Update tick speed depending on distance to waypoint
-            self.tick = int(10 * self.distance  + 30)
-
-            #Checking if distance is increasing, stop driving
-            if self.distance > self.min_dist + 0.1:
-                self.command['motion'] = [0,0]
-                self.notification = 'Robot stopped moving'
-                self.forward = False
-                self.min_dist = 50
-                return
-
-            # Distance is decreasing
-            else:
-                #Drive until goal arrived
-                distance_threshold = 0.1 #0.05
-                if self.distance < distance_threshold:
-                    self.command['motion'] = [0,0]
-                    self.notification = 'Robot arrived'
-                    self.forward = False
-                    self.min_dist = 50
-
-                    #Check if last path and last waypoint reached
-                    if self.point_idx == len(self.waypoints) - 1: #reached last wp of path
-                        if self.path_idx == len(self.paths) - 1: #stop pathing
-                            self.auto_path = False
-                        else: #Increment path and reset idx
-                            self.path_idx += 1
-                            self.waypoints = self.paths[self.path_idx]
-                            self.point_idx = 1 
-                            self.wp = self.waypoints[self.point_idx]
-                        self.pibot.set_velocity([0,0],time = 3)
-                    else:
-                        self.point_idx += 1
-                        self.wp = self.waypoints[self.point_idx]
-                    print(f"Moving to new waypoint {self.wp}")
-                    return
-
-                else:
-                    #ReAdjust angle if theta_error increased
-                    if abs(self.theta_error) > 15/57.3 and self.distance > 0.15: #0.2
-                        self.command['motion'] = [0,0]
-                        self.notification = 'Readjusting angle'
-                        self.forward = False
-                        self.min_dist = 50
-                        return
-
-                    self.min_dist = self.distance
-                    self.command['motion'] = [1,0]
-                    self.notification = 'Robot moving forward'        
+    
 if __name__ == "__main__":
     import argparse
 
@@ -461,10 +364,16 @@ if __name__ == "__main__":
     while start:
         operate.update_keyboard()
         operate.take_pic()
+
+        operate.old_img = operate.img
+        if np.array_equal(operate.old_img,operate.img):
+            operate.update_flag = False
+        else:
+            operate.update_flag = True
+
         drive_meas = operate.control()
         operate.update_slam(drive_meas)
         operate.record_data()
-        #operate.detect_target()
         operate.save_image()
         # visualise
         operate.draw(canvas)
