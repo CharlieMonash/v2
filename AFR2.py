@@ -24,7 +24,7 @@ import slam.aruco_detector as aruco
 # import CV components
 sys.path.insert(0,"{}/network/".format(os.getcwd()))
 sys.path.insert(0,"{}/network/scripts".format(os.getcwd()))
-from network.scripts.detector import Detector
+#from network.scripts.detector import Detector
 
 # import path planning components for M4
 from path_planning.RRT import *
@@ -77,10 +77,10 @@ class Operate:
         self.aruco_img = np.zeros([240,320,3], dtype=np.uint8)
         self.detector_output = np.zeros([240,320], dtype=np.uint8)
         if args.ckpt == "":
-            self.detector = None
+            #self.detector = None
             self.network_vis = cv2.imread('pics/8bit/detector_splash.png')
         else:
-            self.detector = Detector(args.ckpt, use_gpu=False)
+            #self.detector = Detector(args.ckpt, use_gpu=False)
             self.network_vis = np.ones((240, 320,3))* 100
             self.grid = cv2.imread('grid.png')
         self.bg = pygame.image.load('pics/gui_mask.jpg')
@@ -337,6 +337,7 @@ class Operate:
             if self.update_flag:
                 self.ekf.update(lms)
 
+    """
     # using computer vision to detect targets
     def detect_target(self):
         if self.command['inference'] and self.detector is not None:
@@ -344,7 +345,7 @@ class Operate:
             self.command['inference'] = False
             self.file_output = (self.detector_output, self.ekf)
             self.notification = f'{pred_count} fruits detected'
-
+    """
     # save raw images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
@@ -668,12 +669,6 @@ class Operate:
                 if not self.ekf_on:
                     self.notification = 'SLAM is running'
                     self.ekf_on = True
-            # run object detector
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                self.command['inference'] = True
-            # save object detection outputs
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
-                self.command['save_inference'] = True
             # AFR
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 self.path_idx = 0
@@ -687,6 +682,14 @@ class Operate:
                 self.quit = True
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.quit = True
+            """
+            # run object detector
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                self.command['inference'] = True
+            # save object detection outputs
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
+                self.command['save_inference'] = True
+            """
         if self.quit:
             pygame.quit()
             sys.exit()
@@ -857,7 +860,7 @@ if __name__ == "__main__":
         operate.robot_pose = operate.ekf.robot.state
         operate.record_data()
         operate.save_image()
-        operate.detect_target()
+        #operate.detect_target()
         # visualise
         operate.draw(canvas)
         pygame.display.update()
