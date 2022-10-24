@@ -604,13 +604,13 @@ class Operate:
         pygame.draw.line(canvas, red,(h_pad + x + 5,240 + 2*v_pad + y-5), (h_pad + x - 5,240 + 2*v_pad + y + 5))
 
         #Draw path
-        for path in self.paths:
+        '''for path in self.paths:
             for i in range(len(path)-1):
                 x = int(path[i][0]*80 + 120)
                 y = int(120 - path[i][1]*80)
                 x2 = int(path[i+1][0]*80 + 120)
                 y2 = int(120 - path[i+1][1]*80)
-                pygame.draw.line(canvas, blue, (h_pad + x,240 + 2*v_pad + y),(h_pad + x2,240 + 2*v_pad + y2)) #(2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2)) 
+                pygame.draw.line(canvas, blue, (h_pad + x,240 + 2*v_pad + y),(h_pad + x2,240 + 2*v_pad + y2))''' #(2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2)) 
 
 
         self.put_caption(canvas, caption='Slam', position=(2*h_pad+320, v_pad))
