@@ -254,7 +254,7 @@ class Operate:
                 for idx in search_fruits:
                     success = False
                     method = 1
-                    linear_offset = 0.3
+                    linear_offset = 0.2 #Charlie 0.3
                     while not success:
                         location = copy.deepcopy(self.fruit_true_pos[idx])
 
