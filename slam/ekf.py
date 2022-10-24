@@ -105,7 +105,7 @@ class EKF:
         #Robot is going in a straight line
         Q = self.predict_covariance(raw_drive_meas)
 
-        self.P = F @ self.P @ F.T + Q
+        self.P = F @ self.P @ F.T + Q*1.2
         #if raw_drive_meas.left_speed==raw_drive_meas.right_speed:
         #    self.P = F @ self.P @F.T +0.5*Q
         #if (np.absolute(x[0])<0.01 and np.absolute(x[1])<0.01):
@@ -114,7 +114,7 @@ class EKF:
         #else:
         #0.5*Q
         #Relying less on the robots measurements and on the dynamic model
-        #self.P = self.P*0.65
+        self.P = self.P*0.75
         #Charlie swotvac change^
     # the update step of EKF
     def update(self, measurements):
