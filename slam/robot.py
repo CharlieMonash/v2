@@ -81,8 +81,11 @@ class Robot:
             DFx[0,2] = -np.sin(th) * lin_vel * dt
             DFx[1,2] = np.cos(th) * lin_vel * dt
         else: 
-            DFx[0,2] = lin_vel / ang_vel * (-np.cos(th) + np.cos(th+ang_vel*dt)) #check if this should be flipped
-            DFx[1,2] = lin_vel / ang_vel * (-np.sin(th) + np.sin(th+ang_vel*dt))
+            #DFx[0,2] = lin_vel / ang_vel * (-np.cos(th) + np.cos(th+ang_vel*dt)) #check if this should be flipped
+            #DFx[1,2] = lin_vel / ang_vel * (-np.sin(th) + np.sin(th+ang_vel*dt))
+            #New Fix
+            DFx[0,2] = lin_vel / ang_vel * (np.cos(th+ang_vel*dt)-np.cos(th)) #check if this should be flipped
+            DFx[1,2] = lin_vel / ang_vel * ( np.sin(th+ang_vel*dt)-np.sin(th))
 
         return DFx
 
