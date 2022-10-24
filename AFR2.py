@@ -105,6 +105,7 @@ class Operate:
         self.turning_tick = 5
         self.boundary = 0.22
         self.radius = 0.25
+        self.update_flag = True
 
         #Add known markers and fruits from map to SLAM
 
@@ -319,7 +320,7 @@ class Operate:
 
     # SLAM with ARUCO markers
     def update_slam(self, drive_meas):
-        # Charlie
+        #Get the posititins of the fruits
         lms, self.aruco_img = self.aruco_det.detect_marker_positions(self.img)
         if self.request_recover_robot:
             is_success = self.ekf.recover_from_pause(lms)
@@ -333,7 +334,8 @@ class Operate:
         elif self.ekf_on: # and not self.debug_flag:
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
-            self.ekf.update(lms)
+            if self.update_flag:
+                self.ekf.update(lms)
 
     # using computer vision to detect targets
     def detect_target(self):
@@ -845,7 +847,13 @@ if __name__ == "__main__":
             operate.drive_robot()
         drive_meas = operate.control()
 
-        #operate.update_slam(drive_meas)
+        operate.old_img = operate.img
+        if np.array_equal(operate.old_img,operate.img):
+            operate.update_flag = False
+        else:
+            operate.update_flag = True
+
+        operate.update_slam(drive_meas)
         operate.robot_pose = operate.ekf.robot.state
         operate.record_data()
         operate.save_image()
