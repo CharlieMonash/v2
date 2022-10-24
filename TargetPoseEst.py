@@ -73,6 +73,8 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
 
     target_pose_dict = {}
     # for each target in each detection output, estimate its pose
+    print('keys')
+    print(completed_img_dict.keys())
     for target_num in completed_img_dict.keys():
         for i in range(len(completed_img_dict[target_num]['target'][0])):
             box = completed_img_dict[target_num]['target'] # [[x],[y],[width],[height]]
@@ -241,8 +243,8 @@ def merge_estimations(target_pose_dict):
         apple_est = np.array([np.mean(apple_est, axis=0)])
     else:
         if len(apple_est) > 2:
-            apple_est = self.sort_locations_and_merge(apple_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
-    
+            apple_est = sort_locations_and_merge(apple_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            #apple_est = average_fruit_location(apple_est)
     if 'lemon' in search_list:
         lemon_est = np.array([np.mean(lemon_est, axis=0)])
     else:
