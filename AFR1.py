@@ -218,7 +218,7 @@ class Operate:
             self.P[-2,-2] = self.init_lm_cov**2
             self.P[-1,-1] = self.init_lm_cov**2
         return self.marker_gt, self.taglist, self.P
-    """
+    
     def read_true_map(self,fname):
         """"""Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 
@@ -255,7 +255,7 @@ class Operate:
                         fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
 
             return fruit_list, fruit_true_pos, aruco_true_pos
-    """
+    
     def read_slam_map(self,fname):
         """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 
