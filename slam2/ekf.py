@@ -3,7 +3,6 @@ from mapping_utils import MappingUtils
 import cv2
 import math
 import pygame
-import json
 
 class EKF:
     # Implementation of an EKF for SLAM
@@ -29,16 +28,12 @@ class EKF:
             f_ = f'./pics/8bit/lm_{i}.png'
             self.lm_pics.append(pygame.image.load(f_))
 
-        for fruit in ['apple','lemon','orange','pear','strawberry']: #0, 1, 2, 3, 4
+        for fruit in ['apple','lemon','orange','pear','strawberry', 'unknown']: #0, 1, 2, 3, 4
             f_ = f'./pics/8bit/lm_{fruit}.png'
             self.lm_pics.append(pygame.image.load(f_))
 
-        f_ = f'./pics/8bit/lm_unknown.png'
-        self.lm_pics.append(pygame.image.load(f_))
         self.pibot_pic = pygame.image.load(f'./pics/8bit/pibot_top.png')
         self.pibot_pic = pygame.transform.flip(self.pibot_pic,True, False) #Flip image
-
-        self.starting_position = True
 
     def reset(self):
         self.robot.state = np.zeros((3, 1))
@@ -73,20 +68,6 @@ class EKF:
         self.markers = utils.markers
         self.P = P
 
-    def save_for_CV(self):
-        locations = self.markers
-        tags = self.taglist
-
-        map = {}
-        for tag in tags:
-            idx = tags.index(tag)
-            x = locations[0][idx]
-            y = locations[1][idx]
-            map[f'aruco{tag}_0'] = {"x":x,"y":y}
-        with open("lab_output/slam_map.txt",'w') as f:
-            json.dump(map,f)
-
-
     def recover_from_pause(self, measurements):
         if not measurements:
             return False
@@ -116,24 +97,25 @@ class EKF:
 
     # the prediction step of EKF
     def predict(self, raw_drive_meas):
-
-#         F = self.state_transition(raw_drive_meas)
-#         x = self.get_state_vector()
-
-        # TODO: add your codes here to compute the predicted x
-
-        # compute robot's state given the control input
         self.robot.drive(raw_drive_meas)
+        F = self.state_transition(raw_drive_meas)
+        #x = self.get_state_vector()
 
-        # Get A using state_transition() calculate Jacobian of dynamics
-        A = self.state_transition(raw_drive_meas)
-
-        # Get Q using predict_covariance() calculate covariance matrix for dynamics model
+        # TODO: add your codes here to compute the predicted drive
+        #Robot is going in a straight line
         Q = self.predict_covariance(raw_drive_meas)
 
-        # Update robot's uncertainty and update robot's state
-        self.P = A @ self.P @ A.T + Q
-
+        self.P = F @ self.P @ F.T + Q
+        #if raw_drive_meas.left_speed==raw_drive_meas.right_speed:
+        #    self.P = F @ self.P @F.T +0.5*Q
+        #if (np.absolute(x[0])<0.01 and np.absolute(x[1])<0.01):
+        #    self.P=self.P * 0.5
+        #Robot is turning hence more uncertainty
+        #else:
+        #0.5*Q
+        #Relying less on the robots measurements and on the dynamic model
+        self.P = self.P*0.65
+        #Charlie swotvac change^
     # the update step of EKF
     def update(self, measurements):
         if not measurements:
@@ -158,15 +140,13 @@ class EKF:
 
         # TODO: add your codes here to compute the updated x
         #Compute Kalman Gain
-        S = H @ self.P @ H.T + R #+ 0.01*np.eye(R.shape[0])
+        S = H @ self.P @ H.T + R 
         K = self.P @ H.T @ np.linalg.inv(S)
-
-        #Correct state
+        #Adjusting the state
         y = z - z_hat
         x = x + K @ y
+        #Setting state estimate and covariance
         self.set_state_vector(x)
-
-        #Correct covariance
         self.P = (np.eye(x.shape[0]) - K @ H) @ self.P
 
     def state_transition(self, raw_drive_meas):
@@ -178,7 +158,11 @@ class EKF:
     def predict_covariance(self, raw_drive_meas):
         n = self.number_landmarks()*2 + 3
         Q = np.zeros((n,n))
-        Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.01*np.eye(3)
+        #Only updating covariance if the robot moves
+        motion_check = raw_drive_meas.left_speed+raw_drive_meas.right_speed
+        if motion_check !=0:
+            Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.01*np.eye(3)
+
         return Q
 
     def add_landmarks(self, measurements):
@@ -198,19 +182,15 @@ class EKF:
             lm_bff = lm.position
             lm_inertial = robot_xy + R_theta @ lm_bff
 
-            self.taglist.append(int(lm.tag))
-            # self.taglist.append(lm.tag)
+            # self.taglist.append(int(lm.tag))
+            self.taglist.append(lm.tag)
             self.markers = np.concatenate((self.markers, lm_inertial), axis=1)
 
             # Create a simple, large covariance to be fixed by the update step
             self.P = np.concatenate((self.P, np.zeros((2, self.P.shape[1]))), axis=0)
             self.P = np.concatenate((self.P, np.zeros((self.P.shape[0], 2))), axis=1)
-            if self.starting_position:
-                self.P[-2,-2] = 1e-4**2
-                self.P[-1,-1] = 1e-4**2
-            else:
-                self.P[-2,-2] = self.init_lm_cov**2
-                self.P[-1,-1] = self.init_lm_cov**2
+            self.P[-2,-2] = self.init_lm_cov**2
+            self.P[-1,-1] = self.init_lm_cov**2
 
     ##########################################
     ##########################################
@@ -256,8 +236,6 @@ class EKF:
     def to_im_coor(xy, res, m2pixel):
         w, h = res
         x, y = xy
-        # x_im = int(-x*m2pixel+w/2.0)
-        # y_im = int(y*m2pixel+h/2.0)
         x_im = int(x*m2pixel+w/2.0)
         y_im = int(-y*m2pixel+h/2.0)
         return (x_im, y_im)

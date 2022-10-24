@@ -78,11 +78,14 @@ class Robot:
 
         # TODO: add your codes here to compute DFx using lin_vel, ang_vel, dt, and th
         if ang_vel == 0:
-            DFx[0,2] = -np.sin(th)*lin_vel*dt
-            DFx[1,2] = np.cos(th)*lin_vel*dt
-        else:
-            DFx[0,2] = lin_vel/ang_vel * (np.cos(th + dt*ang_vel) - np.cos(th))
-            DFx[1,2] = lin_vel/ang_vel * (np.sin(th + ang_vel*dt) - np.sin(th))
+            DFx[0,2] = -np.sin(th) * lin_vel * dt
+            DFx[1,2] = np.cos(th) * lin_vel * dt
+        else: 
+            #DFx[0,2] = lin_vel / ang_vel * (-np.cos(th) + np.cos(th+ang_vel*dt)) #check if this should be flipped
+            #DFx[1,2] = lin_vel / ang_vel * (-np.sin(th) + np.sin(th+ang_vel*dt))
+            #New Fix
+            DFx[0,2] = lin_vel / ang_vel * (np.cos(th+ang_vel*dt)-np.cos(th)) #check if this should be flipped
+            DFx[1,2] = lin_vel / ang_vel * ( np.sin(th+ang_vel*dt)-np.sin(th))
 
         return DFx
 
@@ -137,8 +140,9 @@ class Robot:
         else:
             Jac2[0,0] = 1 / ang_vel * (np.sin(th2) - np.sin(th))
             Jac2[0,1] = -lin_vel/(ang_vel**2) * (np.sin(th2) - np.sin(th)) + lin_vel / ang_vel * (dt * np.cos(th2))
-            Jac2[1,0] = -1 / ang_vel * (np.cos(th2) - np.cos(th))
-            Jac2[1,1] = lin_vel / (ang_vel**2) * (np.cos(th2) - np.cos(th)) + lin_vel / ang_vel * (dt * np.sin(th2))
+
+            Jac2[1,0] = -1/ang_vel * (np.cos(th2) - np.cos(th))
+            Jac2[1,1] = lin_vel/(ang_vel**2) * (np.cos(th2) - np.cos(th)) + -lin_vel / ang_vel * (-dt * np.sin(th2))
             Jac2[2,1] = dt
 
         # Derivative of x,y,theta w.r.t. left_speed, right_speed
