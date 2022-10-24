@@ -259,7 +259,7 @@ class Operate:
                         location = copy.deepcopy(self.fruit_true_pos[idx])
 
                         if method == 1:
-                            offset = 0.25
+                            offset = 0.18 #0.25
                             # Stop in front of fruit
                             if location[0] > 0 and location[1] > 0:
                                 location -= [offset, offset]
