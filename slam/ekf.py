@@ -1,3 +1,4 @@
+from curses import raw
 import numpy as np
 from mapping_utils import MappingUtils
 import cv2
@@ -109,7 +110,7 @@ class EKF:
         # Get Q using predict_covariance() calculate covariance matrix for dynamics model
         Q = self.predict_covariance(raw_drive_meas)
         # Update robot's uncertainty and update robot's state
-        self.P = F @ self.P @ F.T + Q
+        self.P = F @ self.P @ F.T + 0.55*Q #Joseph Changes
         #self.P = self.P*0.65
 
     # the update step of EKF
@@ -141,7 +142,7 @@ class EKF:
 
         #Adjusting the state
         y = z - z_hat
-        x = x + K @ y
+        x = x + (K @ y*2) #More tweaking
         self.set_state_vector(x)
 
         #Correct covariance
@@ -157,8 +158,13 @@ class EKF:
         n = self.number_landmarks()*2 + 3
         Q = np.zeros((n,n))
         motion_check = raw_drive_meas.left_speed+raw_drive_meas.right_speed
-        if motion_check !=0:
-            Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.01*np.eye(3)
+        if raw_drive_meas.left_speed or raw_drive_meas.right_speed !=0:
+            #Check if its turning 
+            if raw_drive_meas.left_speed != raw_drive_meas.right_speed:
+                Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.04*np.eye(3)
+            else:
+                Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.01*np.eye(3)
+            #Else irt's going in a straight line
         else:
             Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) 
 
