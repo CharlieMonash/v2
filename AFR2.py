@@ -492,14 +492,11 @@ class Operate:
                 pygame.draw.line(canvas, blue, (h_pad + x,240 + 2*v_pad + y),(h_pad + x2,240 + 2*v_pad + y2)) #(2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2)) 
 
 
-        self.put_caption(canvas, caption='Grid Map',
-                         position=(2*h_pad+320, v_pad))
-        self.put_caption(canvas, caption='SLAM', position=(h_pad, 2*v_pad))
+        self.put_caption(canvas, caption='Slam', position=(2*h_pad+320, v_pad))
         self.put_caption(canvas, caption='PiBot Cam', position=(h_pad, v_pad))
-        self.put_caption(canvas, caption='Detector', position=(3*h_pad + 2*320,v_pad))
+        self.put_caption(canvas, caption='Map', position=(h_pad, 240+2*v_pad))
 
-        notifiation = TEXT_FONT.render(self.notification,
-                                          False, text_colour)
+        notifiation = TEXT_FONT.render(self.notification,False, text_colour)
         canvas.blit(notifiation, (h_pad+10, 596))
 
         time_remain = self.count_down - time.time() + self.start_time
