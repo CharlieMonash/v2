@@ -45,6 +45,8 @@ class RRT:
         self.max_nodes = max_points
         self.obstacle_list = obstacle_list
         self.node_list = []
+        self.max_tries = 1000
+        self.tries = 0
 
     def planning(self, animation=True):
         """
@@ -53,7 +55,7 @@ class RRT:
         """
 
         self.node_list = [self.start]
-        while len(self.node_list) <= self.max_nodes:
+        while len(self.node_list) <= self.max_nodes and self.tries < self.max_tries::
 
             # 1. Generate a random node
             rnd_node = self.get_random_node()
@@ -81,7 +83,7 @@ class RRT:
                 final_node = self.steer(self.node_list[-1], self.end, self.expand_dis)
                 if self.is_collision_free(final_node):
                     return self.generate_final_course(len(self.node_list) - 1)
-
+            self.tries += 1
         return None  # cannot find path
 
 
