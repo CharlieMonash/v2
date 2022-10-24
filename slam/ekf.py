@@ -105,7 +105,7 @@ class EKF:
         #Robot is going in a straight line
         Q = self.predict_covariance(raw_drive_meas)
 
-        self.P = F @ self.P @ F.T + Q*1.2
+        self.P = F @ self.P @ F.T + Q
         #if raw_drive_meas.left_speed==raw_drive_meas.right_speed:
         #    self.P = F @ self.P @F.T +0.5*Q
         #if (np.absolute(x[0])<0.01 and np.absolute(x[1])<0.01):
