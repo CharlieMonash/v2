@@ -104,6 +104,7 @@ class Operate:
         self.tick = 30
         self.turning_tick = 5
         self.boundary = 0.22
+        self.radius = 0.25
 
         #Add known markers and fruits from map to SLAM
 
@@ -158,7 +159,7 @@ class Operate:
                 search_list.append(fruit.strip())
 
         return search_list
-
+    """
     def generate_paths(self):
         #getting index of fruits to be searched
         fruit_list_dict = dict(zip(self.fruit_list,range(len(self.fruit_list))))
@@ -205,7 +206,7 @@ class Operate:
                 print(location)
 
             rrt1 = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
-                    expand_dis=1, path_resolution=0.5)
+                    expand_dis=1, path_resolution=0.1)
             print('RRTp1')
             path = rrt1.planning()[::-1] #reverse path
             print('RRT done',idx)
@@ -218,6 +219,105 @@ class Operate:
             paths.append(path)
             start = np.array(goal)
         self.paths = paths
+    """
+    def generate_paths(self):
+        #getting index of fruits to be searched
+        fruit_list_dict = dict(zip(self.fruit_list,range(len(self.fruit_list))))
+        all_fruits = [x for x in range(len(self.fruit_list))]
+        search_fruits = [fruit_list_dict[x] for x in self.search_list]
+        other_fruits = list((set(all_fruits) | set(search_fruits)) - (set(all_fruits) & set(search_fruits)))
+
+        #adding markers as obstacles
+        obstacles = []
+        for x,y in self.aruco_true_pos:
+            obstacles.append([x + 1.5, y + 1.5])
+
+        #adding other fruits as obstacles
+        for idx in all_fruits:
+            x,y = self.fruit_true_pos[idx]
+            obstacles.append([x + 1.5, y + 1.5])
+
+        #printing search fruits location
+        for idx in search_fruits:
+            print(f' {self.fruit_list[idx]} at {self.fruit_true_pos[idx]}')
+
+        radius_success = False
+        while not radius_success:
+            try:
+                all_obstacles = generate_path_obstacles(obstacles, self.boundary) #generating obstacles
+
+                #starting robot pose and empty paths
+                start = np.array([0,0]) + 1.5
+                paths = []
+                print("New path generated")
+
+
+                for idx in search_fruits:
+                    success = False
+                    method = 1
+                    linear_offset = 0.3
+                    while not success:
+                        location = copy.deepcopy(self.fruit_true_pos[idx])
+
+                        if method == 1:
+                            offset = 0.2
+                            # Stop in front of fruit
+                            if location[0] > 0 and location[1] > 0:
+                                location -= [offset, offset]
+                            elif location[0] > 0 and location[1] < 0:
+                                location -= [offset, -offset]
+                            elif location[0] < 0 and location[1] > 0:
+                                location -= [-offset, offset]
+                            else:
+                                location += [offset, offset]
+                        elif method == 2:
+                            if location[1] > 0:
+                                location -= [0, linear_offset]
+                            else:
+                                location += [0, linear_offset]
+                        elif method == 3:
+                            if location[0] > 0:
+                                location -= [linear_offset,0]
+                            else:
+                                location += [linear_offset,0]
+                        elif method == 4:
+                            if location[1] > 0:
+                                location += [0, linear_offset]
+                            else:
+                                location -= [0, linear_offset]
+                        elif method == 5:
+                            if location[0] > 0:
+                                location += [linear_offset,0]
+                            else:
+                                location -= [linear_offset,0]
+                        else:
+                            break
+
+                        goal = np.array(location) + 1.5
+
+                        try:
+                            rrtc = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
+                                expand_dis=1, path_resolution=0.1)
+                            path = rrtc.planning()[::-1] #reverse path
+                            success = True
+                        except:
+                            print(f"{self.fruit_list[idx]} Failed")
+                            method += 1
+
+                    #printing path
+                    for i in range(len(path)):
+                        x, y = path[i]
+                        path[i] = [x - 1.5, y - 1.5]
+                    # print(f'The path is {path}')
+
+                    #adding paths
+                    paths.append(path)
+                    start = np.array(goal)
+                self.paths = paths
+                radius_success = True
+            except:
+                self.boundary -= 0.05
+                print("Radius reduced")
 
     # SLAM with ARUCO markers
     def update_slam(self, drive_meas):
