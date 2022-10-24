@@ -73,11 +73,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
 
     target_pose_dict = {}
     # for each target in each detection output, estimate its pose
-    print('keys')
-    print(completed_img_dict)
-
     for target_num in completed_img_dict.keys():
-        print('Target number: '+str(target_num))
         for i in range(len(completed_img_dict[target_num]['target'][0])):
             box = completed_img_dict[target_num]['target'] # [[x],[y],[width],[height]]
             robot_pose = completed_img_dict[target_num]['robot'] # [[x], [y], [theta]]
@@ -86,9 +82,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
             ######### Replace with your codes #########
             # TODO: compute pose of the target based on bounding box info and robot's pose
             target_pose = {'y': 0.0, 'x': 0.0}
-            
             cam_res = 640 # camera resolution in pixels
-
             A = focal_length * true_height / box[3][i] # actual depth of object
     
             x_robot = robot_pose[0][i]
@@ -107,34 +101,12 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
 
             target_pose = {'y':y_object_world,'x':x_object_world}
             target_pose_dict[f'{target_list[target_num]}_{i}'] = target_pose #target_num-1
-            ###########################################
-        
+            ###########################################   
     return target_pose_dict
-
-# EXTRA: to changes
-def mean_fruit(fruit_est):
-    while len(fruit_est) > 2:
-        min_dist = 9999
-        #find two points close to each other
-        for i, fruit1 in enumerate(fruit_est):
-            for j, fruit2 in enumerate(fruit_est):
-                if (fruit1[0] != fruit2[0]) or (fruit1[1] != fruit2[1]): #if not same fruit
-                    distance = np.sqrt((fruit1[1]-fruit2[1])**2+(fruit1[0]-fruit2[0])**2)
-                    if distance < min_dist:
-                        min_dist = distance
-                        min1 = i
-                        min2 = j
-
-        x_avg = (fruit_est[min1][1] + fruit_est[min2][1])/2 #averaging x
-        y_avg = (fruit_est[min1][0] + fruit_est[min2][0])/2 #averaging y
-        fruit_est = np.delete(fruit_est,(min1, min2), axis=0)
-        fruit_est = np.vstack((fruit_est, [y_avg,x_avg]))
-    return fruit_est
 
 def merge_to_mean(position_est, remove_outlier = False):
     # Set up working parameters
     position_est = np.array(position_est)
-
     position_est_result = []
     z_threshold = 3
 
@@ -269,8 +241,8 @@ def merge_estimations(target_pose_dict):
         strawberry_est = np.array([np.mean(strawberry_est, axis=0)])
     else:
         if len(strawberry_est) > 2:
-            print(strawberry_est)
-            #strawberry_est = sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
+            #print(strawberry_est)
+            strawberry_est = sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
             #NEED TO FIX
 
     for i in range(2):

@@ -233,16 +233,16 @@ class Operate:
             obstacles.append([x + 1.5, y + 1.5])
 
         #adding other fruits as obstacles
-        for idx in all_fruits:
+        for idx in other_fruits: #all_fruits
             x,y = self.fruit_true_pos[idx]
             obstacles.append([x + 1.5, y + 1.5])
 
         #printing search fruits location
-        for idx in search_fruits:
-            print(f' {self.fruit_list[idx]} at {self.fruit_true_pos[idx]}')
+        #for idx in search_fruits:
+        #    print(f' {self.fruit_list[idx]} at {self.fruit_true_pos[idx]}')
 
-        radius_success = False
-        while not radius_success:
+        boundary_success = False
+        while not boundary_success:
             try:
                 all_obstacles = generate_path_obstacles(obstacles, self.boundary) #generating obstacles
 
@@ -250,7 +250,6 @@ class Operate:
                 start = np.array([0,0]) + 1.5
                 paths = []
                 print("New path generated")
-
 
                 for idx in search_fruits:
                     success = False
@@ -260,7 +259,7 @@ class Operate:
                         location = copy.deepcopy(self.fruit_true_pos[idx])
 
                         if method == 1:
-                            offset = 0.2
+                            offset = 0.25
                             # Stop in front of fruit
                             if location[0] > 0 and location[1] > 0:
                                 location -= [offset, offset]
@@ -308,13 +307,12 @@ class Operate:
                     for i in range(len(path)):
                         x, y = path[i]
                         path[i] = [x - 1.5, y - 1.5]
-                    # print(f'The path is {path}')
 
                     #adding paths
                     paths.append(path)
                     start = np.array(goal)
                 self.paths = paths
-                radius_success = True
+                boundary_success = True
             except:
                 self.boundary -= 0.05
                 print("Radius reduced")
