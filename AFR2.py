@@ -197,7 +197,12 @@ class Operate:
 
             print(f' {self.fruit_list[idx]} at {location}')
             goal = np.array(location) + 1.5
-
+            print("obstacles")
+            print(all_obstacles)
+            print("goals")
+            for idx in search_fruits:
+                location = copy.deepcopy(self.fruit_true_pos[idx])
+                print(location)
 
             rrt1 = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
                     expand_dis=1, path_resolution=0.5)
