@@ -48,7 +48,7 @@ def get_image_info(base_dir, file_path, image_poses):
         if len(target_lst_box[i])>0:
             box = np.stack(target_lst_box[i], axis=1)
             pose = np.stack(target_lst_pose[i], axis=1) #i+1
-            completed_img_dict[i+1] = {'target': box, 'robot': pose}
+            completed_img_dict[i] = {'target': box, 'robot': pose}
     return completed_img_dict
 
 # estimate the pose of a target based on size and location of its bounding box in the robot's camera view and the robot's pose
@@ -75,12 +75,13 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     # for each target in each detection output, estimate its pose
     print('keys')
     print(completed_img_dict)
+
     for target_num in completed_img_dict.keys():
         print('Target number: '+str(target_num))
         for i in range(len(completed_img_dict[target_num]['target'][0])):
             box = completed_img_dict[target_num]['target'] # [[x],[y],[width],[height]]
             robot_pose = completed_img_dict[target_num]['robot'] # [[x], [y], [theta]]
-            true_height = target_dimensions[target_num-1][2] #target_num-1
+            true_height = target_dimensions[target_num][2] #target_num-1
             
             ######### Replace with your codes #########
             # TODO: compute pose of the target based on bounding box info and robot's pose
