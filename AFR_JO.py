@@ -17,7 +17,8 @@ import shutil # python package for file operations
 
 # import SLAM components you developed in M2
 sys.path.insert(0, "{}/slam".format(os.getcwd()))
-from slam.ekf import EKF
+from slam.ekf2 import EKF as EKF2
+from slam.ekf import EKF 
 from slam.robot import Robot
 import slam.aruco_detector as aruco
 
@@ -120,6 +121,8 @@ class Operate:
         self.search_list = self.read_search_list()
         print(f'Fruit search order: {self.search_list}')
         self.generate_paths()
+        #Slam is done
+        self.Slam_Done = False
 
     # wheel control
     def control(self):
@@ -368,6 +371,20 @@ class Operate:
         baseline = np.loadtxt(fileB, delimiter=',')
         robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
         return EKF(robot)
+
+    def init_ekf2(self, datadir, ip):
+        fileK = "{}intrinsic.txt".format(datadir)
+        camera_matrix = np.loadtxt(fileK, delimiter=',')
+        fileD = "{}distCoeffs.txt".format(datadir)
+        dist_coeffs = np.loadtxt(fileD, delimiter=',')
+        fileS = "{}scale.txt".format(datadir)
+        scale = np.loadtxt(fileS, delimiter=',')
+        if ip == 'localhost':
+            scale /= 2
+        fileB = "{}baseline.txt".format(datadir)
+        baseline = np.loadtxt(fileB, delimiter=',')
+        robot = Robot(baseline, scale, camera_matrix, dist_coeffs)
+        return EKF2(robot)
 
     # function to save bounding box info
     def bounding_box_output(self, box_list):
@@ -651,6 +668,8 @@ class Operate:
             # save SLAM map
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.command['output'] = True
+                self.ekf = self.init_ekf2(args.calib_dir, args.ip)
+                self.Slam_Done =True
             # reset SLAM map
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 if self.double_reset_comfirm == 0:
