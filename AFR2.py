@@ -489,7 +489,7 @@ class Operate:
                 y = int(120 - path[i][1]*80)
                 x2 = int(path[i+1][0]*80 + 120)
                 y2 = int(120 - path[i+1][1]*80)
-                pygame.draw.line(canvas, blue, (2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2))
+                pygame.draw.line(canvas, blue, (h_pad + x,240 + 2*v_pad + y),(h_pad + x2,240 + 2*v_pad + y2)) #(2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2)) 
 
 
         self.put_caption(canvas, caption='Grid Map',
@@ -694,7 +694,9 @@ if __name__ == "__main__":
     parser.add_argument("--play_data", action='store_true')
     parser.add_argument("--true_map_marker", default="lab_output/slam.txt")
     parser.add_argument("--true_map_fruit", default="lab_output/targets.txt")
-    parser.add_argument("--true_map", default="maps/7fruits_practice_map_1.txt")
+    #parser.add_argument("--true_map", default="maps/7fruits_practice_map_1.txt")
+    parser.add_argument("--true_map", default="maps/M4_true_map_3fruits.txt")
+
     parser.add_argument("--ckpt", default='best.pt')
     args, _ = parser.parse_known_args()
     #Changes I've made 
