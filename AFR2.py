@@ -198,7 +198,7 @@ class Operate:
             print(f' {self.fruit_list[idx]} at {location}')
             goal = np.array(location) + 1.5
             print("obstacles")
-            print(all_obstacles)
+            print(obstacles)
             print("goals")
             for idx in search_fruits:
                 location = copy.deepcopy(self.fruit_true_pos[idx])
