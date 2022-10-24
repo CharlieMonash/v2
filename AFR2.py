@@ -845,7 +845,7 @@ if __name__ == "__main__":
             operate.drive_robot()
         drive_meas = operate.control()
 
-        operate.update_slam(drive_meas)
+        #operate.update_slam(drive_meas)
         operate.robot_pose = operate.ekf.robot.state
         operate.record_data()
         operate.save_image()
