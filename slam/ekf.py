@@ -114,7 +114,7 @@ class EKF:
         #else:
         #0.5*Q
         #Relying less on the robots measurements and on the dynamic model
-        self.P = self.P*0.75
+        self.P = self.P*0.65
         #Charlie swotvac change^
     # the update step of EKF
     def update(self, measurements):
