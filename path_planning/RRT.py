@@ -55,7 +55,7 @@ class RRT:
         """
 
         self.node_list = [self.start]
-        while len(self.node_list) <= self.max_nodes and self.tries < self.max_tries::
+        while len(self.node_list) <= self.max_nodes and self.tries < self.max_tries:
 
             # 1. Generate a random node
             rnd_node = self.get_random_node()
