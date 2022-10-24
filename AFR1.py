@@ -219,43 +219,6 @@ class Operate:
             self.P[-1,-1] = self.init_lm_cov**2
         return self.marker_gt, self.taglist, self.P
     
-    def read_true_map(self,fname):
-        """"""Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
-
-        @param fname: filename of the map
-        @return:
-            1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
-            2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
-            3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-        """"""
-        with open(fname, 'r') as fd:
-            gt_dict = json.load(fd)
-            fruit_list = []
-            fruit_true_pos = []
-            aruco_true_pos = np.empty([10, 2])
-
-            # remove unique id of targets of the same type
-            for key in gt_dict:
-                x = np.round(gt_dict[key]['x'], 1)
-                y = np.round(gt_dict[key]['y'], 1)
-
-                if key.startswith('aruco'):
-                    if key.startswith('aruco10'):
-                        aruco_true_pos[9][0] = x
-                        aruco_true_pos[9][1] = y
-                    else:
-                        marker_id = int(key[5])
-                        aruco_true_pos[marker_id-1][0] = x
-                        aruco_true_pos[marker_id-1][1] = y
-                else:
-                    fruit_list.append(key[:-2])
-                    if len(fruit_true_pos) == 0:
-                        fruit_true_pos = np.array([[x, y]])
-                    else:
-                        fruit_true_pos = np.append(fruit_true_pos, [[x, y]], axis=0)
-
-            return fruit_list, fruit_true_pos, aruco_true_pos
-    
     def read_slam_map(self,fname):
         """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
 
