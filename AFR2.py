@@ -736,6 +736,7 @@ if __name__ == "__main__":
     operate.notification = 'SLAM is running'
     operate.ekf_on = True
     while start:
+        time.sleep(0.2)
         operate.update_keyboard()
         operate.take_pic()
         if operate.auto_path:
