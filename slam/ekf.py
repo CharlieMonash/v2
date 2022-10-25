@@ -142,8 +142,8 @@ class EKF:
 
         #Adjusting the state
         y = z - z_hat
-        #x = x + (K @ y*2) #More tweaking #C2
-        x = x + K @ y
+        x = x + (K @ y*2) #More tweaking #C2
+        #x = x + K @ y
         self.set_state_vector(x)
 
         #Correct covariance
