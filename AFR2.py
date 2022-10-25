@@ -189,13 +189,13 @@ class Operate:
                 for idx in search_fruits:
                     success = False
                     method = 1
-                    linear_offset = 0.2 #Charlie 0.3
+                    linear_offset = 0.25 #Charlie 0.3
 
                     #Depends whether RRT can generate path
                     while not success:
                         location = copy.deepcopy(self.fruit_true_pos[idx])
                         if method == 1:
-                            offset = 0.18 #0.25
+                            offset = 0.2 #0.25
                             # Depends on quadrant
                             if location[0] > 0 and location[1] > 0:
                                 location -= [offset, offset]
