@@ -750,7 +750,6 @@ class Operate:
                 if self.turn_count > 7:
                     #Driving forward
                     self.forward = True
-                    self.drive_robot()
 
             if self.theta_error < 0:
                 self.command['motion'] = [0,1]
@@ -761,7 +760,6 @@ class Operate:
                 if self.turn_count > 7:
                     #Driving forward
                     self.forward = True
-                    self.drive_robot()
 
         # stop turning if less than threshold
         if not self.forward:
