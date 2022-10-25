@@ -301,9 +301,9 @@ class Operate:
                         goal = np.array(location) + 1.5
 
                         try:
-                            rrtc = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
+                            rrt1 = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
                                 expand_dis=1, path_resolution=0.1)
-                            path = rrtc.planning()[::-1] #reverse path
+                            path = rrt1.planning()[::-1] #reverse path
                             success = True
                         except:
                             print(f"{self.fruit_list[idx]} Failed")
@@ -719,10 +719,10 @@ class Operate:
         self.robot_pose = self.ekf.get_state_vector()
         robot_x = self.robot_pose[0]
         robot_y = self.robot_pose[1]
+        robot_theta = self.robot_pose[2]
 
         self.distance = np.sqrt((waypoint_x-robot_x)**2 + (waypoint_y-robot_y)**2) #calculates distance between robot and waypoint
 
-        robot_theta = self.robot_pose[2]
         waypoint_angle = np.arctan2((waypoint_y-robot_y),(waypoint_x-robot_x))
         theta1 = robot_theta - waypoint_angle
         #Drive straught if turned more than 5 times
