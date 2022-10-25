@@ -611,7 +611,7 @@ class Operate:
 
         if self.forward == False:
             #Update turning tick speed depending on theta_error to waypoint
-            self.turning_tick = int(abs(3 * self.theta_error) + 3)
+            self.turning_tick = int(abs(7 * self.theta_error) + 3)
             if self.theta_error > 0:
                 self.command['motion'] = [0,-1]
                 self.notification = 'Robot is turning right'
