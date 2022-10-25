@@ -124,10 +124,10 @@ class Operate:
         if args.play_data:
             lv, rv = self.pibot.set_velocity()
         else:
-            lv, rv = self.pibot.set_velocity(
-                self.command['motion'], self.tick, self.turning_tick)
+            lv, rv = self.pibot.set_velocity(self.command['motion'], self.tick, self.turning_tick)
         if not self.data is None:
             self.data.write_keyboard(lv, rv)
+            #lv/2, rv/2
         dt = time.time() - self.clock
         drive_meas = measure.Drive(lv, rv, dt)
         self.clock = time.time()
@@ -611,7 +611,7 @@ class Operate:
 
         if self.forward == False:
             #Update turning tick speed depending on theta_error to waypoint
-            self.turning_tick = int(abs(7 * self.theta_error) + 3)
+            self.turning_tick = int(abs(5 * self.theta_error) + 3)
             if self.theta_error > 0:
                 self.command['motion'] = [0,-1]
                 self.notification = 'Robot is turning right'
@@ -743,7 +743,7 @@ if __name__ == "__main__":
             operate.drive_robot()
         drive_meas = operate.control()
 
-        #operate.update_slam(drive_meas)
+        operate.update_slam(drive_meas)
         operate.robot_pose = operate.ekf.robot.state
         operate.record_data()
         operate.save_image()
