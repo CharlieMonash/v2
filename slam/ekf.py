@@ -159,7 +159,7 @@ class EKF:
         n = self.number_landmarks()*2 + 3
         Q = np.zeros((n,n))
         motion_check = raw_drive_meas.left_speed+raw_drive_meas.right_speed
-        if raw_drive_meas.left_speed !=0 or raw_drive_meas.right_speed !=0:
+        if raw_drive_meas.left_speed or raw_drive_meas.right_speed !=0:
             #Check if its turning 
             if raw_drive_meas.left_speed != raw_drive_meas.right_speed: #C2
                 Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.04*np.eye(3) #C2
