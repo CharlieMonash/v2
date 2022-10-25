@@ -110,7 +110,7 @@ class EKF:
         # Get Q using predict_covariance() calculate covariance matrix for dynamics model
         Q = self.predict_covariance(raw_drive_meas)
         # Update robot's uncertainty and update robot's state
-        self.P = 0.75*F @ self.P @ F.T + 1.1*Q #Joseph Changes
+        self.P = 0.75*F @ self.P @ F.T + Q #Joseph Changes
         #self.P = self.P*0.65
 
     # the update step of EKF
@@ -161,7 +161,7 @@ class EKF:
         if raw_drive_meas.left_speed !=0 or raw_drive_meas.right_speed !=0:
             #Check if its turning 
             if raw_drive_meas.left_speed != raw_drive_meas.right_speed:
-                Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.04*np.eye(3)
+                Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.02*np.eye(3)
             else:
                 Q[0:3,0:3] = self.robot.covariance_drive(raw_drive_meas) + 0.01*np.eye(3)
             #Else irt's going in a straight line
