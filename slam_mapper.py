@@ -152,8 +152,8 @@ class Operate:
         elif self.ekf_on: 
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
-            if self.update_flag:
-                self.ekf.update(lms)
+            #if self.update_flag:
+            self.ekf.update(lms)
  
     # input CV values from each image
     def bounding_box_output(self, box_list):
