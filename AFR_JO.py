@@ -100,6 +100,7 @@ class Operate:
         self.marker_pos = np.zeros((2,10))
         self.lmc = 1e-6
         self.path_idx = 0
+        self.robot_positions = []
 
         #Contorl and travel parameters
         self.tick = 30
@@ -123,6 +124,7 @@ class Operate:
         self.generate_paths()
         #Slam is done
         self.Slam_Done = False
+        self.pos_error = []
 
     # wheel control
     def control(self):
@@ -604,13 +606,13 @@ class Operate:
         pygame.draw.line(canvas, red,(h_pad + x + 5,240 + 2*v_pad + y-5), (h_pad + x - 5,240 + 2*v_pad + y + 5))
 
         #Draw path
-        '''for path in self.paths:
+        for path in self.paths:
             for i in range(len(path)-1):
                 x = int(path[i][0]*80 + 120)
                 y = int(120 - path[i][1]*80)
                 x2 = int(path[i+1][0]*80 + 120)
                 y2 = int(120 - path[i+1][1]*80)
-                pygame.draw.line(canvas, blue, (h_pad + x,240 + 2*v_pad + y),(h_pad + x2,240 + 2*v_pad + y2))''' #(2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2)) 
+                pygame.draw.line(canvas, blue, (h_pad + x,240 + 2*v_pad + y),(h_pad + x2,240 + 2*v_pad + y2)) #(2*h_pad+320 + x,v_pad + y),(2*h_pad+320 + x2,v_pad + y2)) 
 
 
         self.put_caption(canvas, caption='Slam', position=(2*h_pad+320, v_pad))
@@ -709,12 +711,13 @@ class Operate:
             sys.exit()
 
     def drive_robot(self):
-        waypoint_x = self.wp[0]
-        waypoint_y = self.wp[1]
+        #Adding the errors in the x and y positions
+        waypoint_x = self.wp[0]+self.pos_error[0]
+        waypoint_y = self.wp[1]+self.pos_error[1]
         #Updating the robots pose
         self.robot_pose = self.ekf.get_state_vector()
         robot_x = self.robot_pose[0]
-        robot_y = self.robot_pose[1]-0.0939
+        robot_y = self.robot_pose[1]
 
         self.distance = np.sqrt((waypoint_x-robot_x)**2 + (waypoint_y-robot_y)**2) #calculates distance between robot and waypoint
 
@@ -785,9 +788,11 @@ class Operate:
                             #Set the previous waypoint to the robots pose
                             robot_pose = self.ekf.get_state_vector()
                             robot_pose = np.array([robot_pose[0],robot_pose[1]])
+                            self.robot_positions.append(robot_pose)
+                            self.pos_error = robot_pose - self.paths[self.path_idx][0]
                             #print("\nRobot Pose")
                             #print(robot_pose)
-                            self.paths[self.path_idx] = np.squeeze(robot_pose)#Change the idx back b -1
+                           # self.paths[self.path_idx] = np.squeeze(robot_pose)#Change the idx back b -1
                             #End of my changes
                             self.point_idx = 1 
                             self.wp = self.waypoints[self.point_idx]
