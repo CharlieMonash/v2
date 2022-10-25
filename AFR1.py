@@ -1,4 +1,4 @@
-
+# Waypoint navigate given fruit and slam estimates
 # basic python packages
 import numpy as np
 import cv2
@@ -127,10 +127,7 @@ class Operate:
     # camera control
     def take_pic(self):
         self.img = self.pibot.get_image()
-        """
-        if not self.data is None:
-            self.data.write_image(self.img)
-        """
+
     def detect_fruit_pos(self, dictionary):
         measurements = []
         for fruit in dictionary.keys():
@@ -142,8 +139,6 @@ class Operate:
         return measurements
 
     def read_search_list(self):
-        """Function reads the order of the target fruits returnf the target fruits in order
-        """
         search_list = []
         with open('search_list.txt', 'r') as fd:
             fruits = fd.readlines()
@@ -170,15 +165,6 @@ class Operate:
             self.ekf.add_landmarks(lms)
             self.ekf.update(lms)
 
-    # using computer vision to detect targets
-    def detect_target(self):
-        if self.command['inference'] and self.detector is not None:
-            self.detector_output, self.network_vis, self.bounding_boxes, pred_count = self.detector.detect_single_image(self.img)
-            self.command['inference'] = False
-            self.file_output = (self.detector_output, self.ekf)
-            # self.notification = f'{len(np.unique(self.detector_output))-1} target type(s) detected'
-            self.notification = f'{pred_count} fruits detected'
-
     # wheel and camera calibration for SLAM
     def init_ekf(self, datadir, ip):
         fileK = "{}intrinsic.txt".format(datadir)
@@ -195,7 +181,6 @@ class Operate:
         return EKF(robot)
 
     def parse_slam_map(self, fruit_list, fruits_true_pos, aruco_true_pos):
-
         #adding known aruco markers
         for (i, pos) in enumerate(aruco_true_pos):
             self.taglist.append(i + 1)
@@ -220,14 +205,6 @@ class Operate:
         return self.marker_gt, self.taglist, self.P
     
     def read_slam_map(self,fname):
-        """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
-
-        @param fname: filename of the map
-        @return:
-            1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
-            2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
-            3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-        """
         with open(fname, 'r') as fd:
             gt_dict = json.load(fd)
             slam_pos = np.zeros([10,2])
@@ -246,14 +223,6 @@ class Operate:
             return slam_pos
 
     def read_fruit_map(self,fname):
-        """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
-
-        @param fname: filename of the map
-        @return:
-            1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
-            2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
-            3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-        """
         with open(fname, 'r') as fd:
             gt_dict = json.load(fd)
             fruit_list = []
@@ -272,26 +241,6 @@ class Operate:
 
         return fruit_list, fruit_true_pos
 
-    """
-    fruit_list = []
-    fruit_true_pos = []
-    with open(fname, 'r') as fd:
-        gt_dict = json.load(fd)
-        slam_pos = np.zeros([7,2])
-        i=0
-        # remove unique id of targets of the same type
-        for key in gt_dict["taglist"]:
-            
-            slam_pos[key-1,0] = np.round(gt_dict["map"][0][i], 1)
-            slam_pos[key-1,1] = np.round(gt_dict["map"][1][i], 1)
-            i+=1
-            #marker_id = int(gt_dict["taglist"][key])
-        
-            #aruco_true_pos[marker_id-1][0] = x
-            #aruco_true_pos[marker_id-1][1] = y
-
-        return fruit_list, fruit_true_pos
-    """
     # Paint the GUI
     def draw(self, canvas):
         canvas.blit(self.bg, (0, 0))
@@ -318,10 +267,6 @@ class Operate:
         magenta = pygame.Color(255,0,255)
         grey = pygame.Color(220,220,220)
         purple = pygame.Color(128,0,128)
-
-        #print("Draw")
-        #print(self.fruit_true_pos)
-        #print(self.fruit_list)
 
         #Painting Marker positions on the grid
         for marker in self.aruco_true_pos:
@@ -577,9 +522,6 @@ if __name__ == "__main__":
 
         operate.update_slam(drive_meas)
         operate.robot_pose = operate.ekf.robot.state
-        #operate.record_data()
-        #operate.save_image()
-        #operate.detect_target()
         # Show graphics
         operate.draw(canvas)
         pygame.display.update()

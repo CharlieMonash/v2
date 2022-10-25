@@ -1,16 +1,9 @@
 # estimate the pose of a target object detected
-#CURRENT TARGE POSE
 from pyexpat.errors import XML_ERROR_ABORTED
 import numpy as np
 import json
-import os
 from pathlib import Path
 import ast
-# import cv2
-#import math
-from machinevisiontoolbox import Image
-#from network.scripts.detector import Detector
-import matplotlib.pyplot as plt
 import PIL
 
 # read in the list of detection results with bounding boxes and their matching robot pose info
@@ -56,7 +49,6 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     camera_matrix = camera_matrix
     focal_length = camera_matrix[0][0]
     # actual sizes of targets [For the simulation models]
-    # You need to replace these values for the real world objects
     target_dimensions = []
     apple_dimensions = [0.075448, 0.074871, 0.071889]
     target_dimensions.append(apple_dimensions)
@@ -75,12 +67,10 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     # for each target in each detection output, estimate its pose
     for target_num in completed_img_dict.keys():
         for i in range(len(completed_img_dict[target_num]['target'][0])):
-            box = completed_img_dict[target_num]['target'] # [[x],[y],[width],[height]]
-            robot_pose = completed_img_dict[target_num]['robot'] # [[x], [y], [theta]]
+            box = completed_img_dict[target_num]['target'] # x.y.w.h
+            robot_pose = completed_img_dict[target_num]['robot'] # x.y.theta
             true_height = target_dimensions[target_num][2] #target_num-1
             
-            ######### Replace with your codes #########
-            # TODO: compute pose of the target based on bounding box info and robot's pose
             target_pose = {'y': 0.0, 'x': 0.0}
             cam_res = 640 # camera resolution in pixels
             A = focal_length * true_height / box[3][i] # actual depth of object
@@ -89,7 +79,7 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
             y_robot = robot_pose[1][i]
             theta_robot = robot_pose[2][i]
 
-            x_camera = cam_res/2 - box[0][i]
+            x_camera = cam_res/2 - box[0][i] #offset from centre ie. left is positive, right is negative
             theta_camera = np.arctan(x_camera/focal_length)
             theta_total = theta_robot + theta_camera
 
@@ -105,31 +95,33 @@ def estimate_pose(base_dir, camera_matrix, completed_img_dict):
     return target_pose_dict
 
 def merge_to_mean(position_est, remove_outlier = False):
-    # Set up working parameters
+    # Initialise
     position_est = np.array(position_est)
     position_est_result = []
-    z_threshold = 3
+    da_threshold = 3
 
-    # Compute mean and standard deviations
+    # Mean
     means = np.mean(position_est, axis = 0)
-    #print(means)
-    stds = np.std(position_est, axis = 0)
     mean_x = means[0]
-    std_x = stds[0]
     mean_y = means[1]
+
+    #Std Dev
+    stds = np.std(position_est, axis = 0)
+    std_x = stds[0]
     std_y = stds[1]
     
     # Remove outliers
     if remove_outlier:
         for i in range(len(position_est)):
             coordinates = position_est[i]
-            z_score_x = (coordinates[0] - mean_x)/std_x
-            z_score_y = (coordinates[1] - mean_y)/std_y
-            if np.abs(z_score_x) > z_threshold or np.abs(z_score_y) > z_threshold:
+            score_x = (coordinates[0] - mean_x)/std_x
+            score_y = (coordinates[1] - mean_y)/std_y
+            if np.abs(score_x) > da_threshold or np.abs(score_y) > da_threshold:
                 position_est_result.append(coordinates)
     else:
         position_est_result = position_est
-    # Compute Mean
+
+    # New mean
     new_mean = np.mean(position_est_result, axis = 0)
 
     return new_mean
@@ -141,7 +133,6 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
 
     # Sort data
     for i in range(len(position_est)):
-
         if(use_Kmeans):
             kmeans = KMeans(n_clusters = 2)
             kmeans.fit(position_est)
@@ -149,7 +140,6 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
                 position_est1.append(position_est[i])
             else:
                 position_est2.append(position_est[i])
-
         else:
             if(i == 0): # Take the first position estimation as the reference for the first fruit
                 position_est1.append(position_est[i])
@@ -165,15 +155,16 @@ def sort_locations_and_merge(position_est, distance_threshold = 0.3, remove_outl
                     position_est2.append(coordinates)
 
     # Merge position estimations
-    print(position_est2)
     position1 = merge_to_mean(position_est1, remove_outlier)
     position2 = merge_to_mean(position_est2, remove_outlier)
+    
     # return the position estimations
     positions = []
     if(position1 is not None):
         positions.append(position1)
     if(position2 is not None):
         positions.append(position2)
+
     return positions
 
 def read_search_list():
@@ -204,11 +195,7 @@ def merge_estimations(target_pose_dict):
                 orange_est.append(np.array(list(target_map[f][key].values()), dtype=float))
             elif key.startswith('strawberry'):
                 strawberry_est.append(np.array(list(target_map[f][key].values()), dtype=float))
-                #Charlie - somehow doubling up on values in above part
-                # NEED TO FIX
 
-    ######### Replace with your codes #########
-    # TODO: the operation below takes the first three estimations of each target type, replace it with a better merge solution
     remove_outlier = False
     use_Kmeans = False
     search_list = read_search_list()
@@ -218,7 +205,7 @@ def merge_estimations(target_pose_dict):
     else:
         if len(apple_est) > 2:
             apple_est = sort_locations_and_merge(apple_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
-            #apple_est = average_fruit_location(apple_est)
+
     if 'lemon' in search_list:
         lemon_est = np.array([np.mean(lemon_est, axis=0)])
     else:
@@ -241,9 +228,7 @@ def merge_estimations(target_pose_dict):
         strawberry_est = np.array([np.mean(strawberry_est, axis=0)])
     else:
         if len(strawberry_est) > 2:
-            #print(strawberry_est)
             strawberry_est = sort_locations_and_merge(strawberry_est, distance_threshold = 0.3, remove_outlier = remove_outlier, use_Kmeans = use_Kmeans)
-            #NEED TO FIX
 
     for i in range(2):
         try:

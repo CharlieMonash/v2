@@ -24,7 +24,6 @@ import slam.aruco_detector as aruco
 # import CV components
 sys.path.insert(0,"{}/network/".format(os.getcwd()))
 sys.path.insert(0,"{}/network/scripts".format(os.getcwd()))
-#from network.scripts.detector import Detector
 
 # import path planning components for M4
 from path_planning.RRT import *
@@ -108,7 +107,6 @@ class Operate:
         self.update_flag = True
 
         #Add known markers and fruits from map to SLAM
-
         self.aruco_true_pos = self.read_slam_map(args.true_map_marker)
         self.fruit_list, self.fruit_true_pos = self.read_fruit_map(args.true_map_fruit)
         #self.fruit_list, self.fruit_true_pos, self.aruco_true_pos = self.read_true_map(args.true_map)
@@ -160,67 +158,7 @@ class Operate:
                 search_list.append(fruit.strip())
 
         return search_list
-    """
-    def generate_paths(self):
-        #getting index of fruits to be searched
-        fruit_list_dict = dict(zip(self.fruit_list,range(len(self.fruit_list))))
-        all_fruits = [x for x in range(len(self.fruit_list))]
-        search_fruits = [fruit_list_dict[x] for x in self.search_list]
-        other_fruits = list((set(all_fruits) | set(search_fruits)) - (set(all_fruits) & set(search_fruits)))
-
-        #Putting in the Markers
-        obstacles = []
-        for x,y in self.aruco_true_pos:
-            obstacles.append([x + 1.5, y + 1.5])
-
-        #Making the other fruits obstacles
-        for idx in other_fruits:
-            x,y = self.fruit_true_pos[idx]
-            obstacles.append([x + 1.5, y + 1.5])
-
-        all_obstacles = generate_path_obstacles(obstacles, self.boundary) #generating obstacles
-
-        #starting robot pose and empty paths
-        start = np.array([0,0]) + 1.5
-        paths = []
-        print(self.fruit_true_pos)
-        for idx in search_fruits:
-            location = copy.deepcopy(self.fruit_true_pos[idx])
-            offset = 0.15
-            #Stop in front of fruit
-            if location[0] > 0 and location[1] > 0:
-                location -= [offset, offset]
-            elif location[0] > 0 and location[1] < 0:
-                location -= [offset, -offset]
-            elif location[0] < 0 and location[1] > 0:
-                location -= [-offset, offset]
-            else:
-                location += [offset, offset]
-
-            print(f' {self.fruit_list[idx]} at {location}')
-            goal = np.array(location) + 1.5
-            print("obstacles")
-            print(obstacles)
-            print("goals")
-            for idx in search_fruits:
-                location = copy.deepcopy(self.fruit_true_pos[idx])
-                print(location)
-
-            rrt1 = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
-                    expand_dis=1, path_resolution=0.1)
-            print('RRTp1')
-            path = rrt1.planning()[::-1] #reverse path
-            print('RRT done',idx)
-            #printing path
-            for i in range(len(path)):
-                x, y = path[i]
-                path[i] = [x - 1.5, y - 1.5]
-
-            #adding paths
-            paths.append(path)
-            start = np.array(goal)
-        self.paths = paths
-    """
+    
     def generate_paths(self):
         #getting index of fruits to be searched
         fruit_list_dict = dict(zip(self.fruit_list,range(len(self.fruit_list))))
@@ -238,10 +176,6 @@ class Operate:
             x,y = self.fruit_true_pos[idx]
             obstacles.append([x + 1.5, y + 1.5])
 
-        #printing search fruits location
-        #for idx in search_fruits:
-        #    print(f' {self.fruit_list[idx]} at {self.fruit_true_pos[idx]}')
-
         boundary_success = False
         while not boundary_success:
             try:
@@ -256,12 +190,13 @@ class Operate:
                     success = False
                     method = 1
                     linear_offset = 0.2 #Charlie 0.3
+
+                    #Depends whether RRT can generate path
                     while not success:
                         location = copy.deepcopy(self.fruit_true_pos[idx])
-
                         if method == 1:
                             offset = 0.18 #0.25
-                            # Stop in front of fruit
+                            # Depends on quadrant
                             if location[0] > 0 and location[1] > 0:
                                 location -= [offset, offset]
                             elif location[0] > 0 and location[1] < 0:
@@ -298,7 +233,7 @@ class Operate:
                         try:
                             rrtc = RRT(start=start, goal=goal, width=3, height=3, obstacle_list=all_obstacles,
                                 expand_dis=1, path_resolution=0.1)
-                            path = rrtc.planning()[::-1] #reverse path
+                            path = rrtc.planning()[::-1] 
                             success = True
                         except:
                             print(f"{self.fruit_list[idx]} Failed")
@@ -337,15 +272,6 @@ class Operate:
             if self.update_flag:
                 self.ekf.update(lms)
 
-    """
-    # using computer vision to detect targets
-    def detect_target(self):
-        if self.command['inference'] and self.detector is not None:
-            self.detector_output, self.network_vis, self.bounding_boxes, pred_count = self.detector.detect_single_image(self.img)
-            self.command['inference'] = False
-            self.file_output = (self.detector_output, self.ekf)
-            self.notification = f'{pred_count} fruits detected'
-    """
     # save raw images taken by the camera
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
@@ -423,14 +349,6 @@ class Operate:
         return self.marker_pos, self.taglist, self.P
 
     def read_true_map(self,fname):
-        """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
-
-        @param fname: filename of the map
-        @return:
-            1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
-            2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
-            3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-        """
         with open(fname, 'r') as fd:
             gt_dict = json.load(fd)
             fruit_list = []
@@ -460,14 +378,6 @@ class Operate:
             return fruit_list, fruit_true_pos, aruco_true_pos
 
     def read_slam_map(self,fname):
-        """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
-
-        @param fname: filename of the map
-        @return:
-            1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
-            2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
-            3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-        """
         with open(fname, 'r') as fd:
             gt_dict = json.load(fd)
             slam_pos = np.zeros([10,2])
@@ -487,14 +397,6 @@ class Operate:
             return slam_pos
 
     def read_fruit_map(self,fname):
-        """Read the ground truth map and output the pose of the ArUco markers and 3 types of target fruit to search
-
-        @param fname: filename of the map
-        @return:
-            1) list of target fruits, e.g. ['apple', 'pear', 'lemon']
-            2) locations of the target fruits, [[x1, y1], ..... [xn, yn]]
-            3) locations of ArUco markers in order, i.e. pos[9, :] = position of the aruco10_0 marker
-        """
         with open(fname, 'r') as fd:
             gt_dict = json.load(fd)
             fruit_list = []
@@ -573,7 +475,6 @@ class Operate:
                 pygame.draw.circle(canvas, blue, (h_pad + x,240 + 2*v_pad + y),self.boundary*80)
             else:
                 pygame.draw.circle(canvas, black, (h_pad + x,240 + 2*v_pad + y),0.5*80, 2)
-            
             
         #Painting the robot on the grid
         x = int(self.robot_pose[0]*80 + 120)
@@ -682,14 +583,7 @@ class Operate:
                 self.quit = True
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.quit = True
-            """
-            # run object detector
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                self.command['inference'] = True
-            # save object detection outputs
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_n:
-                self.command['save_inference'] = True
-            """
+
         if self.quit:
             pygame.quit()
             sys.exit()
@@ -860,7 +754,6 @@ if __name__ == "__main__":
         operate.robot_pose = operate.ekf.robot.state
         operate.record_data()
         operate.save_image()
-        #operate.detect_target()
         # visualise
         operate.draw(canvas)
         pygame.display.update()

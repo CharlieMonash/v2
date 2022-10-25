@@ -1,4 +1,9 @@
-# teleoperate the robot and perform SLAM
+# manually control the robot, perform SLAM and take CV images of fruit
+# press enter to run slam, press i when in front of fruit
+# always ensure at least one marker is in view
+# ensure no lag in camera
+# optimally wouldnt have slam and CV in same file (due to computer lag)
+# dont do more than one manouvre at a time
 
 # basic python packages
 from pickle import FALSE, TRUE
@@ -14,8 +19,6 @@ from util.pibot import PenguinPi # access the robot
 import util.DatasetHandler as dh # save/load functions
 import util.measure as measure # measurements
 import pygame # python package for GUI
-#import shutil # python package for file operations
-#import copy
 from pathlib import Path
 
 # import SLAM components
@@ -25,9 +28,7 @@ from slam.robot import Robot
 import slam.aruco_detector as aruco
 
 # import components for the detector
-#import torch
 import json
-#from sklearn.cluster import KMeans
 from network.scripts.detector import Detector
 
 class Operate:
@@ -148,18 +149,19 @@ class Operate:
                 self.notification = 'Recover failed, need >2 landmarks!'
                 self.ekf_on = False
             self.request_recover_robot = False
-        elif self.ekf_on: # and not self.debug_flag:
+        elif self.ekf_on: 
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
             if self.update_flag:
                 self.ekf.update(lms)
  
+    # input CV values from each image
     def bounding_box_output(self, box_list):
-        with open(f'lab_output/img_{self.pred_count}.txt', "w") as f: #Chane thye a back to w if it does not fix it
+        with open(f'lab_output/img_{self.pred_count}.txt', "w") as f:
             json.dump(box_list, f)
             self.pred_count += 1
 
-    # save images taken by the camera
+    # save images taken by the camera and compute bounding box around fruit
     def save_image(self):
         f_ = os.path.join(self.folder, f'img_{self.image_id}.png')
         if self.command['save_image']:
@@ -207,11 +209,11 @@ class Operate:
         robot_view = cv2.resize(self.aruco_img, (320, 240))
         self.draw_pygame_window(canvas, robot_view, position=(h_pad, v_pad))
 
-        # for target detector (M3)
+        # for target detector
         detector_view = cv2.resize(self.network_vis,(320, 240), cv2.INTER_NEAREST)
         self.draw_pygame_window(canvas, detector_view,position=(h_pad, 240+2*v_pad))
 
-        # canvas.blit(self.gui_mask, (0, 0))
+        # GUI captions
         self.put_caption(canvas, caption='SLAM', position=(2*h_pad+320, v_pad))
         self.put_caption(canvas, caption='Detector', position=(h_pad, 240+2*v_pad))
         self.put_caption(canvas, caption='PiBot Cam', position=(h_pad, v_pad))
@@ -342,7 +344,7 @@ if __name__ == "__main__":
                      pygame.image.load('pics/8bit/pibot5.png')]
     pygame.display.update()
 
-    # delete old lab_output files
+    # delete old lab_output files from previous runs
     files = glob.glob('lab_output/*')
     for f in files:
         os.remove(f)
@@ -365,6 +367,7 @@ if __name__ == "__main__":
         operate.update_keyboard()
         operate.take_pic()
 
+        # choose whether to update slam
         operate.old_img = operate.img
         if np.array_equal(operate.old_img,operate.img):
             operate.update_flag = False
@@ -375,6 +378,7 @@ if __name__ == "__main__":
         operate.update_slam(drive_meas)
         operate.record_data()
         operate.save_image()
+        
         # visualise
         operate.draw(canvas)
         pygame.display.update()
