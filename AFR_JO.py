@@ -792,7 +792,7 @@ class Operate:
                             print("\nerror print")
                             self.pos_error = robot_pose - self.paths[self.path_idx][0]
                             #print("\nRobot Pose")
-                            print(self.pose_error)
+                            print(self.pos_error)
                            # self.paths[self.path_idx] = np.squeeze(robot_pose)#Change the idx back b -1
                             #End of my changes
                             self.point_idx = 1 
