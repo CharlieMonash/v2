@@ -18,5 +18,11 @@ rosrun penguinpi_gazebo scene_manager.py -l 7fruits_practice_map_1.txt
 11. python3 TargetPoseEst.py 
 12. python3 mapping_eval.py
 
-13a. python3 AFR1.py
-13b. python3 AFR2.py
+13. Rename slam.txt as slam_sim_1_104.txt
+14. Rename targets.txt as targets_sim_1_104.txt
+
+15a. python3 AFR1.py
+15b. python3 AFR2.py
+
+16. upload final_maps_104.zip to moodle with slam.txt and targets.txt
+
