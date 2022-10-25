@@ -101,7 +101,7 @@ class Operate:
 
         #Contorl and travel parameters
         self.tick = 30
-        self.turning_tick = 5
+        self.turning_tick = 3
         self.boundary = 0.22
         self.radius = 0.25
         self.update_flag = True
