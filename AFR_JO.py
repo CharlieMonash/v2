@@ -783,15 +783,16 @@ class Operate:
                         else: #Increment path and reset idx
                             self.path_idx += 1
                             self.waypoints = self.paths[self.path_idx]
-                            #print("\nPath print")
-                            #print(self.paths[self.path_idx])
+                            print("\nNode Path print")
+                            print(self.paths[self.path_idx][0])
                             #Set the previous waypoint to the robots pose
                             robot_pose = self.ekf.get_state_vector()
                             robot_pose = np.array([robot_pose[0],robot_pose[1]])
                             self.robot_positions.append(robot_pose)
+                            print("\nerror print")
                             self.pos_error = robot_pose - self.paths[self.path_idx][0]
                             #print("\nRobot Pose")
-                            #print(robot_pose)
+                            print(self.robot_pose_error)
                            # self.paths[self.path_idx] = np.squeeze(robot_pose)#Change the idx back b -1
                             #End of my changes
                             self.point_idx = 1 
