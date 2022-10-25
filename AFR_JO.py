@@ -746,17 +746,17 @@ class Operate:
                 #Turn count limit
                 self.notification = 'Robot is turning right'
                 self.turn_count+=1
-                self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
+                #self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
 
             if self.theta_error < 0:
                 self.command['motion'] = [0,1]
                 self.notification = 'Robot is turning left'
                 #Turn count increment
                 self.turn_count+=1
-                self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
+                #self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
 
         # stop turning if less than threshold
-        if not self.forward or self.turn_count>5:
+        if not self.forward:
             if abs(self.theta_error)  < 0.05:
                 self.command['motion'] = [0,0]
                 self.notification = 'Robot stopped turning'
