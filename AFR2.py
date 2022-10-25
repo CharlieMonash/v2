@@ -104,7 +104,6 @@ class Operate:
         self.turning_tick = 3
         self.boundary = 0.22
         self.radius = 0.25
-        self.update_flag = True
 
         #Add known markers and fruits from map to SLAM
         self.aruco_true_pos = self.read_slam_map(args.true_map_marker)
@@ -269,8 +268,7 @@ class Operate:
         elif self.ekf_on: # and not self.debug_flag:
             self.ekf.predict(drive_meas)
             self.ekf.add_landmarks(lms)
-            if self.update_flag:
-                self.ekf.update(lms)
+            self.ekf.update(lms)
 
     # save raw images taken by the camera
     def save_image(self):
@@ -743,12 +741,6 @@ if __name__ == "__main__":
         if operate.auto_path:
             operate.drive_robot()
         drive_meas = operate.control()
-
-        operate.old_img = operate.img
-        if np.array_equal(operate.old_img,operate.img):
-            operate.update_flag = False
-        else:
-            operate.update_flag = True
 
         operate.update_slam(drive_meas)
         operate.robot_pose = operate.ekf.robot.state
