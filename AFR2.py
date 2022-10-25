@@ -605,9 +605,9 @@ class Operate:
             theta2 = robot_theta - waypoint_angle + 2*np.pi
 
         if abs(theta1) > abs(theta2):
-            self.theta_error = theta2
+            self.theta_error = theta2*0.7
         else:
-            self.theta_error = theta1
+            self.theta_error = theta1*0.7
 
         if self.forward == False:
             #Update turning tick speed depending on theta_error to waypoint
