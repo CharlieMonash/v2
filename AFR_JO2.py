@@ -126,6 +126,7 @@ class Operate:
         self.Slam_Done = False
         self.pos_error = []
         self.turn_count = 0
+        self.Go_Forward = False
 
     # wheel control
     def control(self):
@@ -745,25 +746,21 @@ class Operate:
                 self.command['motion'] = [0,-1]
                 #Turn count limit
                 self.notification = 'Robot is turning right'
-                self.turn_count+=1
+                #self.turn_count+=1
                 self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
-                if self.turn_count > 7:
-                    #Driving forward
-                    self.forward = True
+
 
             if self.theta_error < 0:
                 self.command['motion'] = [0,1]
                 self.notification = 'Robot is turning left'
                 #Turn count increment
-                self.turn_count+=1
+                #self.turn_count+=1
                 self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
-                if self.turn_count > 7:
-                    #Driving forward
-                    self.forward = True
+
 
         # stop turning if less than threshold
         if not self.forward:
-            if abs(self.theta_error)  < 0.05:
+            if abs(self.theta_error)  < 0.1:
                 self.command['motion'] = [0,0]
                 self.notification = 'Robot stopped turning'
                 self.forward = True #go forward now
@@ -775,7 +772,7 @@ class Operate:
             self.tick = int(10 * self.distance  + 30)
 
             #Checking if distance is increasing, stop driving
-            if self.distance > self.min_dist + 0.1 and self.turn_count<7:
+            if self.distance > self.min_dist + 0.12 and not self.Go_Forward:
                 self.command['motion'] = [0,0]
                 self.notification = 'Robot stopped moving'
                 self.forward = False
@@ -830,11 +827,16 @@ class Operate:
 
                 else:
                     #ReAdjust angle if theta_error increased
-                    if abs(self.theta_error) > 15/57.3 and self.distance > 0.15: #0.2
+                    if abs(self.theta_error) > 15/57.3 and self.distance > 0.15 and not self.Go_Forward: #0.2
                         self.command['motion'] = [0,0]
                         self.notification = 'Readjusting angle'
                         self.forward = False
                         self.min_dist = 50
+                        self.turn_count+=1
+                        if self.turn_count>8:
+                            self.forward=True
+                            self.Go_Forward =True
+                            self.distance = 0.1
                         return
 
                     self.min_dist = self.distance
