@@ -726,7 +726,7 @@ class Operate:
         waypoint_angle = np.arctan2((waypoint_y-robot_y),(waypoint_x-robot_x))
         theta1 = robot_theta - waypoint_angle
         #Drive straught if turned more than 5 times
-        ''''if self.turn_count >4:
+        ''''if self.turn_count >5:
             self.forward = True'''
         if waypoint_angle < 0:
             theta2 = robot_theta - waypoint_angle - 2*np.pi
@@ -746,15 +746,17 @@ class Operate:
                 #Turn count limit
                 self.notification = 'Robot is turning right'
                 self.turn_count+=1
+                self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
 
             if self.theta_error < 0:
                 self.command['motion'] = [0,1]
                 self.notification = 'Robot is turning left'
                 #Turn count increment
                 self.turn_count+=1
+                self.notification = "Robot has turned: "+str(self.turn_count)+" TIMES"
 
         # stop turning if less than threshold
-        if not self.forward:
+        if not self.forward or self.turn_count>5:
             if abs(self.theta_error)  < 0.05:
                 self.command['motion'] = [0,0]
                 self.notification = 'Robot stopped turning'
