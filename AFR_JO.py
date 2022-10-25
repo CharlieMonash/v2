@@ -122,9 +122,10 @@ class Operate:
         self.search_list = self.read_search_list()
         print(f'Fruit search order: {self.search_list}')
         self.generate_paths()
-        #Slam is done
+        #Slam is done and turn 
         self.Slam_Done = False
         self.pos_error = []
+        self.turn_count = 0
 
     # wheel control
     def control(self):
@@ -724,6 +725,9 @@ class Operate:
         robot_theta = self.robot_pose[2]
         waypoint_angle = np.arctan2((waypoint_y-robot_y),(waypoint_x-robot_x))
         theta1 = robot_theta - waypoint_angle
+        #Drive straught if turned more than 5 times
+        if self.turn_count >4:
+            self.forward = True
         if waypoint_angle < 0:
             theta2 = robot_theta - waypoint_angle - 2*np.pi
         else:
@@ -739,11 +743,15 @@ class Operate:
             self.turning_tick = int(abs(5 * self.theta_error) + 3)
             if self.theta_error > 0:
                 self.command['motion'] = [0,-1]
+                #Turn count limit
                 self.notification = 'Robot is turning right'
+                self.turn_count+=1
 
             if self.theta_error < 0:
                 self.command['motion'] = [0,1]
                 self.notification = 'Robot is turning left'
+                #Turn count increment
+                self.turn_count+=1
 
         # stop turning if less than threshold
         if not self.forward:
@@ -807,6 +815,8 @@ class Operate:
                         print(f"Robot Positon {robot_pose}\n")
                         self.point_idx += 1
                         self.wp = self.waypoints[self.point_idx]
+                        #Setting turn count back to 0
+                        self.turn_count = 0
                     print(f"Moving to new waypoint {self.wp}")
                     return
 
