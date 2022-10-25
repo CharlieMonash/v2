@@ -726,8 +726,8 @@ class Operate:
         waypoint_angle = np.arctan2((waypoint_y-robot_y),(waypoint_x-robot_x))
         theta1 = robot_theta - waypoint_angle
         #Drive straught if turned more than 5 times
-        if self.turn_count >4:
-            self.forward = True
+        ''''if self.turn_count >4:
+            self.forward = True'''
         if waypoint_angle < 0:
             theta2 = robot_theta - waypoint_angle - 2*np.pi
         else:
