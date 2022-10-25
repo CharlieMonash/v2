@@ -712,8 +712,8 @@ class Operate:
 
     def drive_robot(self):
         #Adding the errors in the x and y positions
-        waypoint_x = self.wp[0]+self.pos_error[0]
-        waypoint_y = self.wp[1]+self.pos_error[1]
+        waypoint_x = self.wp[0]#+self.pos_error[0]
+        waypoint_y = self.wp[1]#+self.pos_error[1]
         #Updating the robots pose
         self.robot_pose = self.ekf.get_state_vector()
         robot_x = self.robot_pose[0]

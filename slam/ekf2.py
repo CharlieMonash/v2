@@ -110,7 +110,7 @@ class EKF:
         # Get Q using predict_covariance() calculate covariance matrix for dynamics model
         Q = self.predict_covariance(raw_drive_meas)
         # Update robot's uncertainty and update robot's state
-        self.P = 0.75*F @ self.P @ F.T + Q #Joseph Changes
+        self.P = 0.75*F @ self.P @ F.T + 1.1*Q #Joseph Changes
         #self.P = self.P*0.65
 
     # the update step of EKF
