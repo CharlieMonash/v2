@@ -134,7 +134,7 @@ class EKF:
         H = self.robot.derivative_measure(self.markers, idx_list)
 
         x = self.get_state_vector()
-
+        x2 = self.get_state_vector()
         # TODO: add your codes here to compute the updated x
         #Compute Kalman Gain
         S = H @ self.P @ H.T + R 
@@ -142,7 +142,7 @@ class EKF:
 
         #Adjusting the state
         y = z - z_hat
-        x = x + (K @ y*2) #More tweaking
+        x = x2 + (K @ y) #More tweaking
         self.set_state_vector(x)
 
         #Correct covariance
