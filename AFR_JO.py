@@ -799,6 +799,12 @@ class Operate:
                             self.wp = self.waypoints[self.point_idx]
                         self.pibot.set_velocity([0,0],time = 3)
                     else:
+                        robot_pose = self.ekf.get_state_vector()
+                        robot_pose = np.array([robot_pose[0],robot_pose[1]])
+                        self.robot_positions.append(robot_pose)
+                        #Prinitng positions 
+                        print(f"Waypoint Position {self.waypoints[self.point_idx]}")
+                        print(f"Robot Positon {robot_pose}\n")
                         self.point_idx += 1
                         self.wp = self.waypoints[self.point_idx]
                     print(f"Moving to new waypoint {self.wp}")
