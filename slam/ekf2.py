@@ -137,12 +137,12 @@ class EKF:
         x2 = self.get_state_vector()
         # TODO: add your codes here to compute the updated x
         #Compute Kalman Gain
-        S = H @ self.P @ H.T + R 
+        S = H @ self.P @ H.T + R*0.85
         K = self.P @ H.T @ np.linalg.inv(S)
 
         #Adjusting the state
         y = z - z_hat
-        x = x2 + (K @ y) #More tweaking
+        x = x2 + (K @ y*2) #More tweaking
         self.set_state_vector(x)
 
         #Correct covariance
