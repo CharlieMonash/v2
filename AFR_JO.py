@@ -714,7 +714,7 @@ class Operate:
         #Updating the robots pose
         self.robot_pose = self.ekf.get_state_vector()
         robot_x = self.robot_pose[0]
-        robot_y = self.robot_pose[1]
+        robot_y = self.robot_pose[1]-0.0939
 
         self.distance = np.sqrt((waypoint_x-robot_x)**2 + (waypoint_y-robot_y)**2) #calculates distance between robot and waypoint
 
@@ -780,14 +780,14 @@ class Operate:
                         else: #Increment path and reset idx
                             self.path_idx += 1
                             self.waypoints = self.paths[self.path_idx]
-                            print("\nPath print")
-                            print(self.paths[self.path_idx])
+                            #print("\nPath print")
+                            #print(self.paths[self.path_idx])
                             #Set the previous waypoint to the robots pose
                             robot_pose = self.ekf.get_state_vector()
                             robot_pose = np.array([robot_pose[0],robot_pose[1]])
-                            print("\nRobot Pose")
-                            print(robot_pose)
-                            self.paths[self.path_idx] = np.array([robot_pose[0],robot_pose[1]]) #Change the idx back b -1
+                            #print("\nRobot Pose")
+                            #print(robot_pose)
+                            self.paths[self.path_idx] = np.squeeze(robot_pose)#Change the idx back b -1
                             #End of my changes
                             self.point_idx = 1 
                             self.wp = self.waypoints[self.point_idx]
